@@ -12,3 +12,8 @@ variable "common_tags" {
   description = "Common tags"
   type        = map(string)
 }
+variable "log_retention_days" {
+  description = "Number of days before log files expire"
+  type        = number
+  default     = 90
+}
