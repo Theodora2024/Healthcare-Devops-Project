@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<h2>
+
+{% if edit %}
+
+Edit Appointment
+
+{% else %}
+
+Add Appointment
+
+{% endif %}
+
+</h2>
+
+<form method="POST">
+
+{{ form.hidden_tag() }}
+
+<div class="mb-3">
+
+{{ form.patient_id.label }}
+
+{{ form.patient_id(class="form-select") }}
+
+</div>
+
+<div class="mb-3">
+
+{{ form.doctor_id.label }}
+
+{{ form.doctor_id(class="form-select") }}
+
+</div>
+
+<div class="mb-3">
+
+{{ form.appointment_date.label }}
+
+{{ form.appointment_date(class="form-control") }}
+
+</div>
+
+<div class="mb-3">
+
+{{ form.appointment_time.label }}
+
+{{ form.appointment_time(class="form-control") }}
+
+</div>
+
+<div class="mb-3">
+
+{{ form.status.label }}
+
+{{ form.status(class="form-select") }}
+
+</div>
+
+{{ form.submit(class="btn btn-primary") }}
+
+<a href="{{ url_for('appointment.appointments') }}"
+class="btn btn-secondary">
+
+Cancel
+
+</a>
+
+</form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<h2>
+
+{% if edit %}
+
+Edit Medical Record
+
+{% else %}
+
+Add Medical Record
+
+{% endif %}
+
+</h2>
+
+<form method="POST">
+
+{{ form.hidden_tag() }}
+
+<div class="mb-3">
+
+{{ form.patient_id.label }}
+
+{{ form.patient_id(class="form-select") }}
+
+</div>
+
+<div class="mb-3">
+
+{{ form.doctor_id.label }}
+
+{{ form.doctor_id(class="form-select") }}
+
+</div>
+
+<div class="mb-3">
+
+{{ form.diagnosis.label }}
+
+{{ form.diagnosis(class="form-control") }}
+
+</div>
+
+<div class="mb-3">
+
+{{ form.prescription.label }}
+
+{{ form.prescription(class="form-control", rows="4") }}
+
+</div>
+
+<div class="mb-3">
+
+{{ form.notes.label }}
+
+{{ form.notes(class="form-control", rows="4") }}
+
+</div>
+
+{{ form.submit(class="btn btn-primary") }}
+
+<a href="{{ url_for('medical.records') }}" class="btn btn-secondary">
+
+Cancel
+
+</a>
+
+</form>
+
+</div>
+
+{% endblock %}

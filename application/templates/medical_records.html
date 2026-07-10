@@ -11,18 +11,18 @@
             <h2>Medical Records</h2>
 
             <p class="text-muted">
-                View and manage patient medical history.
+                Manage patient medical records.
             </p>
 
         </div>
 
-        <button class="btn btn-primary">
+        <a href="{{ url_for('medical.add_record') }}" class="btn btn-primary">
 
-            <i class="bi bi-file-earmark-medical"></i>
+            <i class="bi bi-file-earmark-medical-fill"></i>
 
             Add Medical Record
 
-        </button>
+        </a>
 
     </div>
 
@@ -37,10 +37,10 @@
                     <tr>
 
                         <th>Patient</th>
-                        <th>Diagnosis</th>
                         <th>Doctor</th>
+                        <th>Diagnosis</th>
                         <th>Prescription</th>
-                        <th>Visit Date</th>
+                        <th>Notes</th>
                         <th>Actions</th>
 
                     </tr>
@@ -49,65 +49,79 @@
 
                 <tbody>
 
+                {% if records %}
+
+                    {% for record in records %}
+
                     <tr>
-
-                        <td>John Doe</td>
-
-                        <td>Hypertension</td>
-
-                        <td>Dr. Sarah Adams</td>
-
-                        <td>Amlodipine 5mg</td>
-
-                        <td>10 Jul 2026</td>
 
                         <td>
 
-                            <button class="btn btn-sm btn-outline-primary">
+                            {{ record.patient.first_name }}
+                            {{ record.patient.last_name }}
 
-                                View
+                        </td>
 
-                            </button>
+                        <td>
 
-                            <button class="btn btn-sm btn-outline-warning">
+                            {{ record.doctor.name }}
+
+                        </td>
+
+                        <td>
+
+                            {{ record.diagnosis }}
+
+                        </td>
+
+                        <td>
+
+                            {{ record.prescription }}
+
+                        </td>
+
+                        <td>
+
+                            {{ record.notes }}
+
+                        </td>
+
+                        <td>
+
+                            <a href="{{ url_for('medical.edit_record', id=record.id) }}"
+                               class="btn btn-sm btn-outline-warning">
 
                                 Edit
 
-                            </button>
+                            </a>
+
+                            <a href="{{ url_for('medical.delete_record', id=record.id) }}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('Delete this medical record?')">
+
+                                Delete
+
+                            </a>
 
                         </td>
 
                     </tr>
 
+                    {% endfor %}
+
+                {% else %}
+
                     <tr>
 
-                        <td>Mary James</td>
+                        <td colspan="6" class="text-center text-muted">
 
-                        <td>Malaria</td>
-
-                        <td>Dr. Michael Brown</td>
-
-                        <td>Artemether/Lumefantrine</td>
-
-                        <td>08 Jul 2026</td>
-
-                        <td>
-
-                            <button class="btn btn-sm btn-outline-primary">
-
-                                View
-
-                            </button>
-
-                            <button class="btn btn-sm btn-outline-warning">
-
-                                Edit
-
-                            </button>
+                            No medical records found.
 
                         </td>
 
                     </tr>
+
+                {% endif %}
 
                 </tbody>
 

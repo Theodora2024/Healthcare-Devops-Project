@@ -11,26 +11,40 @@
             <h2>Doctors</h2>
 
             <p class="text-muted">
-
                 Manage hospital doctors.
-
             </p>
 
         </div>
 
-        <button class="btn btn-primary">
-
+        <a href="{{ url_for('doctor.add_doctor') }}" class="btn btn-primary">
             <i class="bi bi-person-plus-fill"></i>
-
             Add Doctor
-
-        </button>
+        </a>
 
     </div>
 
     <div class="card shadow-sm">
 
         <div class="card-body">
+
+            <div class="row mb-3">
+
+                <div class="col-md-4">
+
+                    <form method="GET">
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="search"
+                            value="{{ search }}"
+                            placeholder="Search doctor">
+
+                    </form>
+
+                </div>
+
+            </div>
 
             <table class="table table-hover align-middle">
 
@@ -39,15 +53,10 @@
                     <tr>
 
                         <th>Name</th>
-
                         <th>Department</th>
-
                         <th>Specialization</th>
-
                         <th>Phone</th>
-
                         <th>Status</th>
-
                         <th>Actions</th>
 
                     </tr>
@@ -56,81 +65,64 @@
 
                 <tbody>
 
+                {% if doctors %}
+
+                    {% for doctor in doctors %}
+
                     <tr>
 
-                        <td>Dr. Sarah Adams</td>
+                        <td>{{ doctor.name }}</td>
 
-                        <td>Cardiology</td>
+                        <td>{{ doctor.department }}</td>
 
-                        <td>Heart Specialist</td>
+                        <td>{{ doctor.specialization }}</td>
 
-                        <td>08030001111</td>
+                        <td>{{ doctor.phone }}</td>
 
                         <td>
 
                             <span class="badge bg-success">
-
                                 Available
-
                             </span>
 
                         </td>
 
                         <td>
 
-                            <button class="btn btn-sm btn-outline-primary">
-
-                                View
-
-                            </button>
-
-                            <button class="btn btn-sm btn-outline-warning">
+                            <a href="{{ url_for('doctor.edit_doctor', id=doctor.id) }}"
+                               class="btn btn-sm btn-outline-warning">
 
                                 Edit
 
-                            </button>
+                            </a>
+
+                            <a href="{{ url_for('doctor.delete_doctor', id=doctor.id) }}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('Delete this doctor?')">
+
+                                Delete
+
+                            </a>
 
                         </td>
 
                     </tr>
+
+                    {% endfor %}
+
+                {% else %}
 
                     <tr>
 
-                        <td>Dr. Michael Brown</td>
+                        <td colspan="6" class="text-center text-muted">
 
-                        <td>Pediatrics</td>
-
-                        <td>Child Health</td>
-
-                        <td>08032223333</td>
-
-                        <td>
-
-                            <span class="badge bg-danger">
-
-                                On Leave
-
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            <button class="btn btn-sm btn-outline-primary">
-
-                                View
-
-                            </button>
-
-                            <button class="btn btn-sm btn-outline-warning">
-
-                                Edit
-
-                            </button>
+                            No doctors found.
 
                         </td>
 
                     </tr>
+
+                {% endif %}
 
                 </tbody>
 
