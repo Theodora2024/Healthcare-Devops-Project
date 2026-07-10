@@ -63,6 +63,10 @@ module "ec2" {
   key_name              = var.key_name
   root_volume_size      = var.root_volume_size
   common_tags           = local.common_tags
+  
+  depends_on = [
+    module.iam
+  ]
 }
 
 # S3 Module 
@@ -75,6 +79,8 @@ module "s3" {
   environment = var.environment
 
   common_tags = local.common_tags
+
+  log_retention_days = var.log_retention_days
 
 }
 
@@ -90,5 +96,9 @@ module "cloudwatch" {
   instance_id = module.ec2.instance_id
 
   common_tags = local.common_tags
+
+  depends_on = [
+  module.ec2
+]
 
 }

@@ -64,3 +64,19 @@ resource "aws_s3_bucket_ownership_controls" "ownership" {
   }
 
 }
+resource "aws_s3_bucket_lifecycle_configuration" "this" {
+  bucket = aws_s3_bucket.healthcare_bucket.id
+
+  rule {
+    id     = "log-lifecycle"
+    status = "Enabled"
+
+    filter {
+      prefix = "logs/"
+    }
+
+    expiration {
+      days = var.log_retention_days
+    }
+  }
+}

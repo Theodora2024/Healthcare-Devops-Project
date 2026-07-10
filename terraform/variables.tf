@@ -48,3 +48,8 @@ variable "root_volume_size" {
   description = "Root EBS volume size in GB"
   type        = number
 }
+variable "log_retention_days" {
+  description = "Number of days before log files expire"
+  type        = number
+  default     = 90
+}
