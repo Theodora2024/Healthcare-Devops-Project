@@ -6,6 +6,13 @@ from models import Doctor, db, Patient
 from routes.doctor_routes import doctor_bp
 from routes.appointment_routes import appointment_bp
 from routes.medical_routes import medical_bp
+from models import (
+    Patient,
+    Doctor,
+    Appointment,
+    MedicalRecord
+)
+
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -14,6 +21,7 @@ app.register_blueprint(patient_bp)
 app.register_blueprint(doctor_bp)
 app.register_blueprint(appointment_bp)
 app.register_blueprint(medical_bp)
+
 db.init_app(app)
 
 with app.app_context():
@@ -30,7 +38,30 @@ def login():
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html")
+
+    patient_count = Patient.query.count()
+
+    doctor_count = Doctor.query.count()
+
+    appointment_count = Appointment.query.count()
+
+    medical_record_count = MedicalRecord.query.count()
+
+    recent_patients = (
+        Patient.query
+        .order_by(Patient.id.desc())
+        .limit(5)
+        .all()
+    )
+
+    return render_template(
+        "dashboard.html",
+        patient_count=patient_count,
+        doctor_count=doctor_count,
+        appointment_count=appointment_count,
+        medical_record_count=medical_record_count,
+        recent_patients=recent_patients
+    )
 
 
 if __name__ == "__main__":
