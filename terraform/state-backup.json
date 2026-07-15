@@ -1,0 +1,2132 @@
+{
+  "version": 4,
+  "terraform_version": "1.15.7",
+  "serial": 13,
+  "lineage": "c95f798d-38f1-0866-4850-9d8697d5ede3",
+  "outputs": {
+    "bucket_name": {
+      "value": "healthcare-dev-qs7e9k",
+      "type": "string"
+    },
+    "cloudwatch_dashboard": {
+      "value": "healthcare-dev-dashboard",
+      "type": "string"
+    },
+    "ec2_private_ip": {
+      "value": "10.0.1.48",
+      "type": "string"
+    },
+    "ec2_public_ip": {
+      "value": "18.170.60.21",
+      "type": "string"
+    },
+    "instance_id": {
+      "value": "i-023ecb315567acad2",
+      "type": "string"
+    },
+    "instance_profile_name": {
+      "value": "healthcare-dev-profile",
+      "type": "string"
+    },
+    "internet_gateway_id": {
+      "value": "igw-0cb819ab6b4d735b7",
+      "type": "string"
+    },
+    "nat_gateway_id": {
+      "value": "nat-09793500c78c86509",
+      "type": "string"
+    },
+    "private_subnet_ids": {
+      "value": [
+        "subnet-0cc80c0348e0ee2db",
+        "subnet-0bae8b57e816dd153"
+      ],
+      "type": [
+        "tuple",
+        [
+          "string",
+          "string"
+        ]
+      ]
+    },
+    "public_subnet_ids": {
+      "value": [
+        "subnet-0d8e5a2ffa4920304",
+        "subnet-02ac8cef893dece6e"
+      ],
+      "type": [
+        "tuple",
+        [
+          "string",
+          "string"
+        ]
+      ]
+    },
+    "security_group_id": {
+      "value": "sg-086ebc3794c3037be",
+      "type": "string"
+    },
+    "vpc_id": {
+      "value": "vpc-058016ce05edcf2af",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "module": "module.cloudwatch",
+      "mode": "managed",
+      "type": "aws_cloudwatch_dashboard",
+      "name": "dashboard",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "dashboard_arn": "arn:aws:cloudwatch::245758552830:dashboard/healthcare-dev-dashboard",
+            "dashboard_body": "{\"widgets\":[]}",
+            "dashboard_name": "healthcare-dev-dashboard",
+            "id": "healthcare-dev-dashboard",
+            "region": "eu-west-2"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "dashboard_name": "healthcare-dev-dashboard",
+            "region": "eu-west-2"
+          },
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.ec2.aws_instance.healthcare_server",
+            "module.ec2.data.aws_ami.amazon_linux",
+            "module.iam.aws_iam_instance_profile.this",
+            "module.iam.aws_iam_role.ec2_role",
+            "module.iam.aws_iam_role_policy_attachment.cloudwatch",
+            "module.iam.aws_iam_role_policy_attachment.s3",
+            "module.iam.aws_iam_role_policy_attachment.ssm",
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_subnet.public_2",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.cloudwatch",
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "healthcare_logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:logs:eu-west-2:245758552830:log-group:/aws/ec2/healthcare-dev",
+            "deletion_protection_enabled": false,
+            "id": "/aws/ec2/healthcare-dev",
+            "kms_key_id": "",
+            "log_group_class": "STANDARD",
+            "name": "/aws/ec2/healthcare-dev",
+            "name_prefix": "",
+            "region": "eu-west-2",
+            "retention_in_days": 30,
+            "skip_destroy": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "name": "/aws/ec2/healthcare-dev",
+            "region": "eu-west-2"
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ==",
+          "dependencies": [
+            "module.ec2.aws_instance.healthcare_server",
+            "module.ec2.data.aws_ami.amazon_linux",
+            "module.iam.aws_iam_instance_profile.this",
+            "module.iam.aws_iam_role.ec2_role",
+            "module.iam.aws_iam_role_policy_attachment.cloudwatch",
+            "module.iam.aws_iam_role_policy_attachment.s3",
+            "module.iam.aws_iam_role_policy_attachment.ssm",
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_subnet.public_2",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.cloudwatch",
+      "mode": "managed",
+      "type": "aws_cloudwatch_metric_alarm",
+      "name": "cpu_alarm",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "actions_enabled": true,
+            "alarm_actions": [],
+            "alarm_description": "High CPU utilization",
+            "alarm_name": "healthcare-dev-cpu-high",
+            "arn": "arn:aws:cloudwatch:eu-west-2:245758552830:alarm:healthcare-dev-cpu-high",
+            "comparison_operator": "GreaterThanThreshold",
+            "datapoints_to_alarm": 0,
+            "dimensions": {
+              "InstanceId": "i-023ecb315567acad2"
+            },
+            "evaluate_low_sample_count_percentiles": "",
+            "evaluation_criteria": [],
+            "evaluation_interval": 0,
+            "evaluation_periods": 2,
+            "extended_statistic": "",
+            "id": "healthcare-dev-cpu-high",
+            "insufficient_data_actions": [],
+            "metric_name": "CPUUtilization",
+            "metric_query": [],
+            "namespace": "AWS/EC2",
+            "ok_actions": [],
+            "period": 300,
+            "region": "eu-west-2",
+            "statistic": "Average",
+            "tags": {},
+            "tags_all": {},
+            "threshold": 80,
+            "threshold_metric_id": "",
+            "treat_missing_data": "missing",
+            "unit": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "alarm_name": "healthcare-dev-cpu-high",
+            "region": "eu-west-2"
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "module.ec2.aws_instance.healthcare_server",
+            "module.ec2.data.aws_ami.amazon_linux",
+            "module.iam.aws_iam_instance_profile.this",
+            "module.iam.aws_iam_role.ec2_role",
+            "module.iam.aws_iam_role_policy_attachment.cloudwatch",
+            "module.iam.aws_iam_role_policy_attachment.s3",
+            "module.iam.aws_iam_role_policy_attachment.ssm",
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_subnet.public_2",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.cloudwatch",
+      "mode": "managed",
+      "type": "aws_cloudwatch_metric_alarm",
+      "name": "status_check",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "actions_enabled": true,
+            "alarm_actions": [],
+            "alarm_description": "EC2 status check failed",
+            "alarm_name": "healthcare-dev-status-check",
+            "arn": "arn:aws:cloudwatch:eu-west-2:245758552830:alarm:healthcare-dev-status-check",
+            "comparison_operator": "GreaterThanThreshold",
+            "datapoints_to_alarm": 0,
+            "dimensions": {
+              "InstanceId": "i-023ecb315567acad2"
+            },
+            "evaluate_low_sample_count_percentiles": "",
+            "evaluation_criteria": [],
+            "evaluation_interval": 0,
+            "evaluation_periods": 2,
+            "extended_statistic": "",
+            "id": "healthcare-dev-status-check",
+            "insufficient_data_actions": [],
+            "metric_name": "StatusCheckFailed",
+            "metric_query": [],
+            "namespace": "AWS/EC2",
+            "ok_actions": [],
+            "period": 300,
+            "region": "eu-west-2",
+            "statistic": "Maximum",
+            "tags": {},
+            "tags_all": {},
+            "threshold": 1,
+            "threshold_metric_id": "",
+            "treat_missing_data": "missing",
+            "unit": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "alarm_name": "healthcare-dev-status-check",
+            "region": "eu-west-2"
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "module.ec2.aws_instance.healthcare_server",
+            "module.ec2.data.aws_ami.amazon_linux",
+            "module.iam.aws_iam_instance_profile.this",
+            "module.iam.aws_iam_role.ec2_role",
+            "module.iam.aws_iam_role_policy_attachment.cloudwatch",
+            "module.iam.aws_iam_role_policy_attachment.s3",
+            "module.iam.aws_iam_role_policy_attachment.ssm",
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_subnet.public_2",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.ec2",
+      "mode": "data",
+      "type": "aws_ami",
+      "name": "amazon_linux",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_unsafe_filter": null,
+            "architecture": "x86_64",
+            "arn": "arn:aws:ec2:eu-west-2::image/ami-0a4a6d30e571bd34a",
+            "block_device_mappings": [
+              {
+                "device_name": "/dev/xvda",
+                "ebs": {
+                  "delete_on_termination": "true",
+                  "encrypted": "false",
+                  "iops": "3000",
+                  "snapshot_id": "snap-0c3b28bb49c66afa7",
+                  "throughput": "125",
+                  "volume_initialization_rate": "0",
+                  "volume_size": "30",
+                  "volume_type": "gp3"
+                },
+                "no_device": "",
+                "virtual_name": ""
+              }
+            ],
+            "boot_mode": "uefi-preferred",
+            "creation_date": "2026-07-10T21:54:34.000Z",
+            "deprecation_time": "2028-07-10T21:54:34.000Z",
+            "description": "Amazon Linux AMI 2023.0.20260710 x86_64 ECS HVM EBS",
+            "ena_support": true,
+            "executable_users": null,
+            "filter": [
+              {
+                "name": "name",
+                "values": [
+                  "al2023-ami-*-x86_64"
+                ]
+              }
+            ],
+            "hypervisor": "xen",
+            "id": "ami-0a4a6d30e571bd34a",
+            "image_id": "ami-0a4a6d30e571bd34a",
+            "image_location": "amazon/al2023-ami-ecs-hvm-2023.0.20260710-kernel-6.1-x86_64",
+            "image_owner_alias": "amazon",
+            "image_type": "machine",
+            "imds_support": "v2.0",
+            "include_deprecated": false,
+            "kernel_id": "",
+            "last_launched_time": "",
+            "most_recent": true,
+            "name": "al2023-ami-ecs-hvm-2023.0.20260710-kernel-6.1-x86_64",
+            "name_regex": null,
+            "owner_id": "591542846629",
+            "owners": [
+              "amazon"
+            ],
+            "platform": "",
+            "platform_details": "Linux/UNIX",
+            "product_codes": [],
+            "public": true,
+            "ramdisk_id": "",
+            "region": "eu-west-2",
+            "root_device_name": "/dev/xvda",
+            "root_device_type": "ebs",
+            "root_snapshot_id": "snap-0c3b28bb49c66afa7",
+            "sriov_net_support": "simple",
+            "state": "available",
+            "state_reason": {
+              "code": "UNSET",
+              "message": "UNSET"
+            },
+            "tags": {},
+            "timeouts": null,
+            "tpm_support": "",
+            "uefi_data": null,
+            "usage_operation": "RunInstances",
+            "virtualization_type": "hvm"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "module": "module.ec2",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "healthcare_server",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "ami": "ami-0a4a6d30e571bd34a",
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:instance/i-023ecb315567acad2",
+            "associate_public_ip_address": true,
+            "availability_zone": "eu-west-2a",
+            "capacity_reservation_specification": [
+              {
+                "capacity_reservation_preference": "open",
+                "capacity_reservation_target": []
+              }
+            ],
+            "cpu_options": [
+              {
+                "amd_sev_snp": "",
+                "core_count": 1,
+                "nested_virtualization": "",
+                "threads_per_core": 2
+              }
+            ],
+            "credit_specification": [
+              {
+                "cpu_credits": "unlimited"
+              }
+            ],
+            "disable_api_stop": false,
+            "disable_api_termination": false,
+            "ebs_block_device": [],
+            "ebs_optimized": false,
+            "enable_primary_ipv6": null,
+            "enclave_options": [
+              {
+                "enabled": false
+              }
+            ],
+            "ephemeral_block_device": [],
+            "force_destroy": false,
+            "get_password_data": false,
+            "hibernation": false,
+            "host_id": "",
+            "host_resource_group_arn": null,
+            "iam_instance_profile": "healthcare-dev-profile",
+            "id": "i-023ecb315567acad2",
+            "instance_initiated_shutdown_behavior": "stop",
+            "instance_lifecycle": "",
+            "instance_market_options": [],
+            "instance_state": "running",
+            "instance_type": "t3.micro",
+            "ipv6_address_count": 0,
+            "ipv6_addresses": [],
+            "key_name": "sp-kpair",
+            "launch_template": [],
+            "maintenance_options": [
+              {
+                "auto_recovery": "default"
+              }
+            ],
+            "metadata_options": [
+              {
+                "http_endpoint": "enabled",
+                "http_protocol_ipv6": "disabled",
+                "http_put_response_hop_limit": 2,
+                "http_tokens": "required",
+                "instance_metadata_tags": "disabled"
+              }
+            ],
+            "monitoring": false,
+            "network_interface": [],
+            "outpost_arn": "",
+            "password_data": "",
+            "placement_group": "",
+            "placement_group_id": "",
+            "placement_partition_number": 0,
+            "primary_network_interface": [
+              {
+                "delete_on_termination": true,
+                "network_interface_id": "eni-06fb3be965e1f2df4"
+              }
+            ],
+            "primary_network_interface_id": "eni-06fb3be965e1f2df4",
+            "private_dns": "ip-10-0-1-48.eu-west-2.compute.internal",
+            "private_dns_name_options": [
+              {
+                "enable_resource_name_dns_a_record": false,
+                "enable_resource_name_dns_aaaa_record": false,
+                "hostname_type": "ip-name"
+              }
+            ],
+            "private_ip": "10.0.1.48",
+            "public_dns": "ec2-18-170-60-21.eu-west-2.compute.amazonaws.com",
+            "public_ip": "18.170.60.21",
+            "region": "eu-west-2",
+            "root_block_device": [
+              {
+                "delete_on_termination": true,
+                "device_name": "/dev/xvda",
+                "encrypted": true,
+                "iops": 3000,
+                "kms_key_id": "arn:aws:kms:eu-west-2:245758552830:key/c8ed4e73-54d4-4059-b126-634dc51b265c",
+                "tags": null,
+                "tags_all": {},
+                "throughput": 125,
+                "volume_id": "vol-042a9dcbfe641fa47",
+                "volume_size": 30,
+                "volume_type": "gp3"
+              }
+            ],
+            "secondary_network_interface": [],
+            "secondary_private_ips": [],
+            "security_groups": [],
+            "source_dest_check": true,
+            "spot_instance_request_id": "",
+            "subnet_id": "subnet-0d8e5a2ffa4920304",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-ec2",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-ec2",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tenancy": "default",
+            "timeouts": null,
+            "user_data": "#!/bin/bash\r\n\r\ndnf update -y\r\n\r\ndnf install git -y\r\n\r\ndnf install docker -y\r\n\r\nsystemctl enable docker\r\n\r\nsystemctl start docker\r\n\r\nusermod -aG docker ec2-user\r\n\r\ndnf install amazon-cloudwatch-agent -y",
+            "user_data_base64": null,
+            "user_data_replace_on_change": false,
+            "volume_tags": null,
+            "vpc_security_group_ids": [
+              "sg-086ebc3794c3037be"
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "i-023ecb315567acad2",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMCwicmVhZCI6OTAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMiJ9",
+          "dependencies": [
+            "module.ec2.data.aws_ami.amazon_linux",
+            "module.iam.aws_iam_instance_profile.this",
+            "module.iam.aws_iam_role.ec2_role",
+            "module.iam.aws_iam_role_policy_attachment.cloudwatch",
+            "module.iam.aws_iam_role_policy_attachment.s3",
+            "module.iam.aws_iam_role_policy_attachment.ssm",
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_subnet.public_2",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.iam",
+      "mode": "managed",
+      "type": "aws_iam_instance_profile",
+      "name": "this",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::245758552830:instance-profile/healthcare-dev-profile",
+            "create_date": "2026-07-09T03:24:11Z",
+            "id": "healthcare-dev-profile",
+            "name": "healthcare-dev-profile",
+            "name_prefix": "",
+            "path": "/",
+            "role": "healthcare-dev-ec2-role",
+            "tags": {},
+            "tags_all": {},
+            "unique_id": "AIPATSOCZ5L7CNRHIU4DC"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "name": "healthcare-dev-profile"
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ==",
+          "dependencies": [
+            "module.iam.aws_iam_role.ec2_role"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.iam",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ec2_role",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::245758552830:role/healthcare-dev-ec2-role",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-07-09T03:24:09Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "healthcare-dev-ec2-role",
+            "inline_policy": [],
+            "managed_policy_arns": [
+              "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+              "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+              "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+            ],
+            "max_session_duration": 3600,
+            "name": "healthcare-dev-ec2-role",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-ec2-role",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-ec2-role",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "unique_id": "AROATSOCZ5L7KIYW4XUGT"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "name": "healthcare-dev-ec2-role"
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "module": "module.iam",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "cloudwatch",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "healthcare-dev-ec2-role/arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+            "policy_arn": "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+            "role": "healthcare-dev-ec2-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "policy_arn": "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+            "role": "healthcare-dev-ec2-role"
+          },
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.iam.aws_iam_role.ec2_role"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.iam",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "s3",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "healthcare-dev-ec2-role/arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+            "policy_arn": "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+            "role": "healthcare-dev-ec2-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "policy_arn": "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+            "role": "healthcare-dev-ec2-role"
+          },
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.iam.aws_iam_role.ec2_role"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.iam",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "ssm",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "healthcare-dev-ec2-role/arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "role": "healthcare-dev-ec2-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "policy_arn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "role": "healthcare-dev-ec2-role"
+          },
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.iam.aws_iam_role.ec2_role"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "healthcare_bucket",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::healthcare-dev-qs7e9k",
+            "bucket": "healthcare-dev-qs7e9k",
+            "bucket_domain_name": "healthcare-dev-qs7e9k.s3.amazonaws.com",
+            "bucket_namespace": "global",
+            "bucket_prefix": "",
+            "bucket_region": "eu-west-2",
+            "bucket_regional_domain_name": "healthcare-dev-qs7e9k.s3.eu-west-2.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "a036fa11dfd2e0f01431147c47f286c762414e8ba4ee54776413ab96470dea55",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3GKZC51ZF0DB4",
+            "id": "healthcare-dev-qs7e9k",
+            "lifecycle_rule": [
+              {
+                "abort_incomplete_multipart_upload_days": 0,
+                "enabled": true,
+                "expiration": [
+                  {
+                    "date": "",
+                    "days": 90,
+                    "expired_object_delete_marker": false
+                  }
+                ],
+                "id": "log-lifecycle",
+                "noncurrent_version_expiration": [],
+                "noncurrent_version_transition": [],
+                "prefix": "logs/",
+                "tags": {},
+                "transition": []
+              }
+            ],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "eu-west-2",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "",
+                        "sse_algorithm": "AES256"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-bucket",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-bucket",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "bucket": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.s3.random_string.bucket_suffix"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_lifecycle_configuration",
+      "name": "this",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "bucket": "healthcare-dev-qs7e9k",
+            "expected_bucket_owner": "",
+            "id": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2",
+            "rule": [
+              {
+                "abort_incomplete_multipart_upload": [],
+                "expiration": [
+                  {
+                    "date": null,
+                    "days": 90,
+                    "expired_object_delete_marker": false
+                  }
+                ],
+                "filter": [
+                  {
+                    "and": [],
+                    "object_size_greater_than": null,
+                    "object_size_less_than": null,
+                    "prefix": "logs/",
+                    "tag": []
+                  }
+                ],
+                "id": "log-lifecycle",
+                "noncurrent_version_expiration": [],
+                "noncurrent_version_transition": [],
+                "prefix": "",
+                "status": "Enabled",
+                "transition": []
+              }
+            ],
+            "timeouts": null,
+            "transition_default_minimum_object_size": "all_storage_classes_128K"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "bucket": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2"
+          },
+          "dependencies": [
+            "module.s3.aws_s3_bucket.healthcare_bucket",
+            "module.s3.random_string.bucket_suffix"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_ownership_controls",
+      "name": "ownership",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "healthcare-dev-qs7e9k",
+            "id": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2",
+            "rule": [
+              {
+                "object_ownership": "BucketOwnerPreferred"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "bucket": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2"
+          },
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.healthcare_bucket",
+            "module.s3.random_string.bucket_suffix"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "public_access",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "healthcare-dev-qs7e9k",
+            "id": "healthcare-dev-qs7e9k",
+            "ignore_public_acls": true,
+            "region": "eu-west-2",
+            "restrict_public_buckets": true,
+            "skip_destroy": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "bucket": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2"
+          },
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.healthcare_bucket",
+            "module.s3.random_string.bucket_suffix"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "encryption",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "healthcare-dev-qs7e9k",
+            "expected_bucket_owner": "",
+            "id": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "",
+                    "sse_algorithm": "AES256"
+                  }
+                ],
+                "blocked_encryption_types": [
+                  "SSE-C"
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "account_id": "245758552830",
+            "bucket": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2"
+          },
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.healthcare_bucket",
+            "module.s3.random_string.bucket_suffix"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "versioning",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "healthcare-dev-qs7e9k",
+            "expected_bucket_owner": "",
+            "id": "healthcare-dev-qs7e9k",
+            "mfa": null,
+            "region": "eu-west-2",
+            "versioning_configuration": [
+              {
+                "mfa_delete": "Disabled",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "account_id": "245758552830",
+            "bucket": "healthcare-dev-qs7e9k",
+            "region": "eu-west-2"
+          },
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.healthcare_bucket",
+            "module.s3.random_string.bucket_suffix"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "random_string",
+      "name": "bucket_suffix",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "id": "qs7e9k",
+            "keepers": null,
+            "length": 6,
+            "lower": true,
+            "min_lower": 0,
+            "min_numeric": 0,
+            "min_special": 0,
+            "min_upper": 0,
+            "number": true,
+            "numeric": true,
+            "override_special": null,
+            "result": "qs7e9k",
+            "special": false,
+            "upper": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "module": "module.security_group",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "healthcare_sg",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:security-group/sg-086ebc3794c3037be",
+            "description": "Security Group for Healthcare Application",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "Allow all outbound traffic",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "id": "sg-086ebc3794c3037be",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 5000,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 5000
+              },
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 8080,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 8080
+              },
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "HTTP",
+                "from_port": 80,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 80
+              },
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "HTTPS",
+                "from_port": 443,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 443
+              },
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "SSH Access",
+                "from_port": 22,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 22
+              }
+            ],
+            "name": "healthcare-dev-sg",
+            "name_prefix": "",
+            "owner_id": "245758552830",
+            "region": "eu-west-2",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-sg",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-sg",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "sg-086ebc3794c3037be",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.security_group",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_egress_rule",
+      "name": "all_outbound",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:security-group-rule/sgr-0b67a5cb79c5cb69b",
+            "cidr_ipv4": "0.0.0.0/0",
+            "cidr_ipv6": null,
+            "description": "Allow all outbound traffic",
+            "from_port": null,
+            "id": "sgr-0b67a5cb79c5cb69b",
+            "ip_protocol": "-1",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "region": "eu-west-2",
+            "security_group_id": "sg-086ebc3794c3037be",
+            "security_group_rule_id": "sgr-0b67a5cb79c5cb69b",
+            "tags": null,
+            "tags_all": {},
+            "to_port": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "sgr-0b67a5cb79c5cb69b",
+            "region": "eu-west-2"
+          },
+          "dependencies": [
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.security_group",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "http",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:security-group-rule/sgr-074dc3dff06785291",
+            "cidr_ipv4": "0.0.0.0/0",
+            "cidr_ipv6": null,
+            "description": "HTTP",
+            "from_port": 80,
+            "id": "sgr-074dc3dff06785291",
+            "ip_protocol": "tcp",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "region": "eu-west-2",
+            "security_group_id": "sg-086ebc3794c3037be",
+            "security_group_rule_id": "sgr-074dc3dff06785291",
+            "tags": null,
+            "tags_all": {},
+            "to_port": 80
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "sgr-074dc3dff06785291",
+            "region": "eu-west-2"
+          },
+          "dependencies": [
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.security_group",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "https",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:security-group-rule/sgr-096fb91ff6a709c41",
+            "cidr_ipv4": "0.0.0.0/0",
+            "cidr_ipv6": null,
+            "description": "HTTPS",
+            "from_port": 443,
+            "id": "sgr-096fb91ff6a709c41",
+            "ip_protocol": "tcp",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "region": "eu-west-2",
+            "security_group_id": "sg-086ebc3794c3037be",
+            "security_group_rule_id": "sgr-096fb91ff6a709c41",
+            "tags": null,
+            "tags_all": {},
+            "to_port": 443
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "sgr-096fb91ff6a709c41",
+            "region": "eu-west-2"
+          },
+          "dependencies": [
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.security_group",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "ssh",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:security-group-rule/sgr-08569e4e997ac2236",
+            "cidr_ipv4": "0.0.0.0/0",
+            "cidr_ipv6": null,
+            "description": "SSH Access",
+            "from_port": 22,
+            "id": "sgr-08569e4e997ac2236",
+            "ip_protocol": "tcp",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "region": "eu-west-2",
+            "security_group_id": "sg-086ebc3794c3037be",
+            "security_group_rule_id": "sgr-08569e4e997ac2236",
+            "tags": null,
+            "tags_all": {},
+            "to_port": 22
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "sgr-08569e4e997ac2236",
+            "region": "eu-west-2"
+          },
+          "dependencies": [
+            "module.security_group.aws_security_group.healthcare_sg",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "nat",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": null,
+            "allocation_id": "eipalloc-0ce3a64d1e6428b68",
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:elastic-ip/eipalloc-0ce3a64d1e6428b68",
+            "associate_with_private_ip": null,
+            "association_id": "eipassoc-00009c75dfb9fec61",
+            "carrier_ip": "",
+            "customer_owned_ip": "",
+            "customer_owned_ipv4_pool": "",
+            "domain": "vpc",
+            "id": "eipalloc-0ce3a64d1e6428b68",
+            "instance": "",
+            "ipam_pool_id": "",
+            "network_border_group": "eu-west-2",
+            "network_interface": "eni-027eb016ff7ee9eee",
+            "private_dns": "ip-10-0-1-96.eu-west-2.compute.internal",
+            "private_ip": "10.0.1.96",
+            "ptr_record": "",
+            "public_dns": "ec2-18-171-11-73.eu-west-2.compute.amazonaws.com",
+            "public_ip": "18.171.11.73",
+            "public_ipv4_pool": "amazon",
+            "region": "eu-west-2",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-nat-eip",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-nat-eip",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "eipalloc-0ce3a64d1e6428b68",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxODAwMDAwMDAwMDAsInJlYWQiOjkwMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_internet_gateway",
+      "name": "this",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:internet-gateway/igw-0cb819ab6b4d735b7",
+            "id": "igw-0cb819ab6b4d735b7",
+            "owner_id": "245758552830",
+            "region": "eu-west-2",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-igw",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-igw",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "igw-0cb819ab6b4d735b7",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_nat_gateway",
+      "name": "this",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allocation_id": "eipalloc-0ce3a64d1e6428b68",
+            "association_id": "eipassoc-00009c75dfb9fec61",
+            "auto_provision_zones": null,
+            "auto_scaling_ips": null,
+            "availability_mode": "zonal",
+            "availability_zone_address": [],
+            "connectivity_type": "public",
+            "id": "nat-09793500c78c86509",
+            "network_interface_id": "eni-027eb016ff7ee9eee",
+            "private_ip": "10.0.1.96",
+            "public_ip": "18.171.11.73",
+            "region": "eu-west-2",
+            "regional_nat_gateway_address": [],
+            "regional_nat_gateway_auto_mode": null,
+            "route_table_id": null,
+            "secondary_allocation_ids": [],
+            "secondary_private_ip_address_count": 0,
+            "secondary_private_ip_addresses": [],
+            "subnet_id": "subnet-0d8e5a2ffa4920304",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-nat",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-nat",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "nat-09793500c78c86509",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwMCwidXBkYXRlIjo2MDAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "module.vpc.aws_eip.nat",
+            "module.vpc.aws_internet_gateway.this",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table",
+      "name": "private",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:route-table/rtb-0c58016c74210d4c3",
+            "id": "rtb-0c58016c74210d4c3",
+            "owner_id": "245758552830",
+            "propagating_vgws": [],
+            "region": "eu-west-2",
+            "route": [
+              {
+                "carrier_gateway_id": "",
+                "cidr_block": "0.0.0.0/0",
+                "core_network_arn": "",
+                "destination_prefix_list_id": "",
+                "egress_only_gateway_id": "",
+                "gateway_id": "",
+                "ipv6_cidr_block": "",
+                "local_gateway_id": "",
+                "nat_gateway_id": "nat-09793500c78c86509",
+                "network_interface_id": "",
+                "odb_network_arn": "",
+                "transit_gateway_id": "",
+                "vpc_endpoint_id": "",
+                "vpc_peering_connection_id": ""
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-private-rt",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-private-rt",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "rtb-0c58016c74210d4c3",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_eip.nat",
+            "module.vpc.aws_internet_gateway.this",
+            "module.vpc.aws_nat_gateway.this",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:route-table/rtb-045bd252411fc1725",
+            "id": "rtb-045bd252411fc1725",
+            "owner_id": "245758552830",
+            "propagating_vgws": [],
+            "region": "eu-west-2",
+            "route": [
+              {
+                "carrier_gateway_id": "",
+                "cidr_block": "0.0.0.0/0",
+                "core_network_arn": "",
+                "destination_prefix_list_id": "",
+                "egress_only_gateway_id": "",
+                "gateway_id": "igw-0cb819ab6b4d735b7",
+                "ipv6_cidr_block": "",
+                "local_gateway_id": "",
+                "nat_gateway_id": "",
+                "network_interface_id": "",
+                "odb_network_arn": "",
+                "transit_gateway_id": "",
+                "vpc_endpoint_id": "",
+                "vpc_peering_connection_id": ""
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-public-rt",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-public-rt",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "rtb-045bd252411fc1725",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_internet_gateway.this",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "private_1",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-036f3bc83312ef485",
+            "region": "eu-west-2",
+            "route_table_id": "rtb-0c58016c74210d4c3",
+            "subnet_id": "subnet-0cc80c0348e0ee2db",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "rtbassoc-036f3bc83312ef485",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_eip.nat",
+            "module.vpc.aws_internet_gateway.this",
+            "module.vpc.aws_nat_gateway.this",
+            "module.vpc.aws_route_table.private",
+            "module.vpc.aws_subnet.private_1",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "private_2",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-05d530a5bd81ac619",
+            "region": "eu-west-2",
+            "route_table_id": "rtb-0c58016c74210d4c3",
+            "subnet_id": "subnet-0bae8b57e816dd153",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "rtbassoc-05d530a5bd81ac619",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_eip.nat",
+            "module.vpc.aws_internet_gateway.this",
+            "module.vpc.aws_nat_gateway.this",
+            "module.vpc.aws_route_table.private",
+            "module.vpc.aws_subnet.private_2",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "public_1",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-0502591de8da8337e",
+            "region": "eu-west-2",
+            "route_table_id": "rtb-045bd252411fc1725",
+            "subnet_id": "subnet-0d8e5a2ffa4920304",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "rtbassoc-0502591de8da8337e",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_internet_gateway.this",
+            "module.vpc.aws_route_table.public",
+            "module.vpc.aws_subnet.public_1",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "public_2",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-0f91e0ae2b5c0ae96",
+            "region": "eu-west-2",
+            "route_table_id": "rtb-045bd252411fc1725",
+            "subnet_id": "subnet-02ac8cef893dece6e",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "rtbassoc-0f91e0ae2b5c0ae96",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_internet_gateway.this",
+            "module.vpc.aws_route_table.public",
+            "module.vpc.aws_subnet.public_2",
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "private_1",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:subnet/subnet-0cc80c0348e0ee2db",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "eu-west-2a",
+            "availability_zone_id": "euw2-az2",
+            "cidr_block": "10.0.11.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-0cc80c0348e0ee2db",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_ipam_pool_id": null,
+            "ipv6_native": false,
+            "ipv6_netmask_length": null,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": false,
+            "outpost_arn": "",
+            "owner_id": "245758552830",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "region": "eu-west-2",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-private-1",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-private-1",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "subnet-0cc80c0348e0ee2db",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "private_2",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:subnet/subnet-0bae8b57e816dd153",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "eu-west-2b",
+            "availability_zone_id": "euw2-az3",
+            "cidr_block": "10.0.12.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-0bae8b57e816dd153",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_ipam_pool_id": null,
+            "ipv6_native": false,
+            "ipv6_netmask_length": null,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": false,
+            "outpost_arn": "",
+            "owner_id": "245758552830",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "region": "eu-west-2",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-private-2",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-private-2",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "subnet-0bae8b57e816dd153",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "public_1",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:subnet/subnet-0d8e5a2ffa4920304",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "eu-west-2a",
+            "availability_zone_id": "euw2-az2",
+            "cidr_block": "10.0.1.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-0d8e5a2ffa4920304",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_ipam_pool_id": null,
+            "ipv6_native": false,
+            "ipv6_netmask_length": null,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": true,
+            "outpost_arn": "",
+            "owner_id": "245758552830",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "region": "eu-west-2",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-public-1",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-public-1",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "subnet-0d8e5a2ffa4920304",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "public_2",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:subnet/subnet-02ac8cef893dece6e",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "eu-west-2b",
+            "availability_zone_id": "euw2-az3",
+            "cidr_block": "10.0.2.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-02ac8cef893dece6e",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_ipam_pool_id": null,
+            "ipv6_native": false,
+            "ipv6_netmask_length": null,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": true,
+            "outpost_arn": "",
+            "owner_id": "245758552830",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "region": "eu-west-2",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-public-2",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-public-2",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-058016ce05edcf2af"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "subnet-02ac8cef893dece6e",
+            "region": "eu-west-2"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "module.vpc.aws_vpc.this"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "this",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-west-2:245758552830:vpc/vpc-058016ce05edcf2af",
+            "assign_generated_ipv6_cidr_block": false,
+            "cidr_block": "10.0.0.0/16",
+            "default_network_acl_id": "acl-03ad93b9614270d0a",
+            "default_route_table_id": "rtb-011938b2ebbf9cd77",
+            "default_security_group_id": "sg-0480120899d968435",
+            "dhcp_options_id": "dopt-0eed5d49e12445957",
+            "enable_dns_hostnames": true,
+            "enable_dns_support": true,
+            "enable_network_address_usage_metrics": false,
+            "id": "vpc-058016ce05edcf2af",
+            "instance_tenancy": "default",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "ipv6_association_id": "",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_network_border_group": "",
+            "ipv6_ipam_pool_id": "",
+            "ipv6_netmask_length": 0,
+            "main_route_table_id": "rtb-011938b2ebbf9cd77",
+            "owner_id": "245758552830",
+            "region": "eu-west-2",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-vpc",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "Terraform",
+              "Name": "healthcare-dev-vpc",
+              "Owner": "Theodora",
+              "Project": "healthcare"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "identity": {
+            "account_id": "245758552830",
+            "id": "vpc-058016ce05edcf2af",
+            "region": "eu-west-2"
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ=="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+
