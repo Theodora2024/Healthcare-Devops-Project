@@ -239,6 +239,6 @@ Throughout this project I gained hands-on experience with:
 
 Cloud | DevOps | Microsoft 365 Administrator
 
-GitHub: *(your GitHub profile)*
+GitHub: *https://github.com/Theodora2024*
 
-LinkedIn: *(your LinkedIn profile)*
+LinkedIn: *https://www.linkedin.com/in/dorah-tech/*
