@@ -1,4 +1,4 @@
-############################################
+
 # Root Module
 
 # VPC Module
@@ -63,7 +63,7 @@ module "ec2" {
   key_name              = var.key_name
   root_volume_size      = var.root_volume_size
   common_tags           = local.common_tags
-  
+
   depends_on = [
     module.iam
   ]
@@ -98,7 +98,7 @@ module "cloudwatch" {
   common_tags = local.common_tags
 
   depends_on = [
-  module.ec2
-]
+    module.ec2
+  ]
 
 }
