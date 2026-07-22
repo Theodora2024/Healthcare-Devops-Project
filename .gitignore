@@ -1,0 +1,33 @@
+# Python
+venv/
+**/venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment variables
+.env
+
+# Flask
+instance/
+
+# VS Code
+.vscode/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+terraform.tfstate.backup
+
+# Node / React
+node_modules/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
