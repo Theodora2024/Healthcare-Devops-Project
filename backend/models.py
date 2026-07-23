@@ -1,11 +1,12 @@
-from flask_sqlalchemy import SQLAlchemy
+from extensions import db
 from datetime import datetime
 
-db = SQLAlchemy()
+
 
 
 class Patient(db.Model):
 
+      
     __tablename__ = "patients"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -32,9 +33,22 @@ class Patient(db.Model):
     def __repr__(self):
         return f"{self.first_name} {self.last_name}"
 
+    def to_dict(self):
+      return {
+        "id": self.id,
+        "first_name": self.first_name,
+        "last_name": self.last_name,
+        "gender": self.gender,
+        "age": self.age,
+        "phone": self.phone,
+        "email": self.email,
+        "diagnosis": self.diagnosis,
+        "created_at": self.created_at.isoformat() if self.created_at else None
+    }
 
 class Doctor(db.Model):
 
+  
     __tablename__ = "doctors"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -53,7 +67,16 @@ class Doctor(db.Model):
         db.DateTime,
         default=datetime.utcnow
     )
-
+    def to_dict(self):
+      return {
+        "id": self.id,
+        "name": self.name,
+        "department": self.department,
+        "specialization": self.specialization,
+        "phone": self.phone,
+        "email": self.email,
+        "created_at": self.created_at.isoformat() if self.created_at else None
+    }
 
 class Appointment(db.Model):
 
@@ -81,7 +104,18 @@ class Appointment(db.Model):
 
     doctor = db.relationship("Doctor")
 
-
+    def to_dict(self):
+      return {
+        "id": self.id,
+        "patient_id": self.patient_id,
+        "doctor_id": self.doctor_id,
+        "appointment_date": (
+            self.appointment_date.isoformat()
+            if self.appointment_date else None
+        ),
+        "appointment_time": self.appointment_time,
+        "status": self.status
+    }
 class MedicalRecord(db.Model):
 
     __tablename__ = "medical_records"
@@ -108,7 +142,19 @@ class MedicalRecord(db.Model):
         db.DateTime,
         default=datetime.utcnow
     )
-
+    def to_dict(self):
+      return {
+        "id": self.id,
+        "patient_id": self.patient_id,
+        "doctor_id": self.doctor_id,
+        "diagnosis": self.diagnosis,
+        "prescription": self.prescription,
+        "notes": self.notes,
+        "created_at": (
+            self.created_at.isoformat()
+            if self.created_at else None
+        )
+    }
     patient = db.relationship("Patient")
 
     doctor = db.relationship("Doctor")
