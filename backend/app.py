@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-
+from flask_cors import CORS
 from config import Config
 from routes.patient_routes import patient_bp
 from extensions import db
@@ -18,6 +18,8 @@ from routes.api.appointments import appointments_api
 from routes.api.medical_records import medical_records_api
 
 app = Flask(__name__)
+CORS(app)
+
 app.register_blueprint(patients_api)
 app.register_blueprint(doctors_api)
 app.register_blueprint(appointments_api)
