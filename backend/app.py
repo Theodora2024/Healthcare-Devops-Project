@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_cors import CORS
+from flask_migrate import Migrate
 from config import Config
 from routes.patient_routes import patient_bp
 from extensions import db
@@ -17,8 +18,18 @@ from routes.api.doctors import doctors_api
 from routes.api.appointments import appointments_api
 from routes.api.medical_records import medical_records_api
 
+
+
 app = Flask(__name__)
+
+app.config.from_object(Config)
+
 CORS(app)
+
+db.init_app(app)
+
+
+migrate = Migrate(app, db)
 
 app.register_blueprint(patients_api)
 app.register_blueprint(doctors_api)
@@ -30,14 +41,6 @@ app.register_blueprint(patient_bp)
 app.register_blueprint(doctor_bp)
 app.register_blueprint(appointment_bp)
 app.register_blueprint(medical_bp)
-
-db.init_app(app)
-
-with app.app_context():
-    db.create_all()
-
-    print("Patients:", Patient.query.count())
-    print("Doctors:", Doctor.query.count())
 
 
 @app.route("/")
