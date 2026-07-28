@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Sidebar() {
   return (
@@ -6,10 +6,27 @@ function Sidebar() {
       <h3>Healthcare</h3>
 
       <ul>
-        <li><Link to="/">Dashboard</Link></li>
-        <li><Link to="/patients">Patients</Link></li>
-        <li><Link to="/doctors">Doctors</Link></li>
-        <li><Link to="/appointments">Appointments</Link></li>
+        <li>
+          <NavLink to="/">Dashboard</NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/patients">Patients</NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/doctors">Doctors</NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/appointments">Appointments</NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/medical-records">
+            Medical Records
+          </NavLink>
+        </li>
       </ul>
     </aside>
   );

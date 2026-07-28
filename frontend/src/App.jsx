@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Patients from "./pages/Patients/Patients";
 import Doctors from "./pages/Doctors/Doctors";
 import Appointments from "./pages/Appointments/Appointments";
+import MedicalRecords from "./pages/MedicalRecords/MedicalRecords";
 import Login from "./pages/Login/Login";
 import NotFound from "./pages/NotFound/NotFound";
 
@@ -18,10 +19,13 @@ function App() {
           <Route path="patients" element={<Patients />} />
           <Route path="doctors" element={<Doctors />} />
           <Route path="appointments" element={<Appointments />} />
+          <Route path="/medical-records" element={<MedicalRecords />} />
+          <Route path="*" element={<NotFound />} />
+          
         </Route>
 
         <Route path="login" element={<Login />} />
-        <Route path="*" element={<NotFound />} />
+        
       </Routes>
     </BrowserRouter>
   );

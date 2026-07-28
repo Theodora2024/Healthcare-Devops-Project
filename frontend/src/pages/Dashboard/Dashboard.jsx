@@ -1,67 +1,62 @@
 import { useEffect, useState } from "react";
-import {
-  getPatients,
-  getDoctors,
-  getAppointments,
-  getMedicalRecords,
-} from "../../services/dashboardService";
+import { getDashboard } from "../../services/dashboardService";
 
-import StatCard from "../../components/dashboard/StatCard";
+function StatCard({ title, value }) {
+  return (
+    <div
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "20px",
+        textAlign: "center",
+        backgroundColor: "#f8f9fa",
+      }}
+    >
+      <h3>{title}</h3>
+      <h2>{value}</h2>
+    </div>
+  );
+}
 
 function Dashboard() {
-  const [stats, setStats] = useState({
-    patients: 0,
-    doctors: 0,
-    appointments: 0,
-    records: 0,
-  });
-
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const [
-          patients,
-          doctors,
-          appointments,
-          records,
-        ] = await Promise.all([
-          getPatients(),
-          getDoctors(),
-          getAppointments(),
-          getMedicalRecords(),
-        ]);
-
-        setStats({
-          patients: patients.data.length,
-          doctors: doctors.data.length,
-          appointments: appointments.data.length,
-          records: records.data.length,
-        });
-      } catch (err) {
-        console.error(err);
+        const data = await getDashboard();
+        setDashboardData(data);
+      } catch (error) {
+        console.error("Error loading dashboard:", error);
       }
     }
 
     loadDashboard();
   }, []);
 
+  if (!dashboardData) {
+    return <h2>Loading dashboard...</h2>;
+  }
+
   return (
-    <>
-      <h1>Dashboard</h1>
+    <div>
+      <h1>Healthcare Dashboard</h1>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
+          gridTemplateColumns: "repeat(4, 1fr)",
           gap: "20px",
+          marginTop: "20px",
         }}
       >
-        <StatCard title="Patients" value={stats.patients} />
-        <StatCard title="Doctors" value={stats.doctors} />
-        <StatCard title="Appointments" value={stats.appointments} />
-        <StatCard title="Medical Records" value={stats.records} />
+        <StatCard title="Patients" value={dashboardData.patients} />
+        <StatCard title="Doctors" value={dashboardData.doctors} />
+        <StatCard title="Appointments" value={dashboardData.appointments} />
+        <StatCard title="Medical Records" value={dashboardData.records} />
       </div>
-    </>
+    </div>
   );
 }
 

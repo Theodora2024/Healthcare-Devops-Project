@@ -1,58 +1,52 @@
 
 import { useEffect, useState } from "react";
 import { getDoctors } from "../../services/doctorService";
-import DoctorTable from "../../components/tables/DoctorTable";
 
 function Doctors() {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    loadDoctors();
+  }, []);
 
-    const [doctors, setDoctors] = useState([]);
-    const [loading, setLoading] = useState(true);
+  async function loadDoctors() {
+    try {
+      const data = await getDoctors();
+      setDoctors(data);
+    } catch (err) {
+      console.error(err);
+      setError("Unable to load doctors.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
-    useEffect(() => {
+  return (
+    <div>
+      <h2>Doctors</h2>
 
-        async function loadDoctors() {
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Specialization</th>
+          </tr>
+        </thead>
 
-            try {
-
-                const data = await getDoctors();
-                setDoctors(data);
-
-            } catch (error) {
-
-                console.error(error);
-
-            } finally {
-
-                setLoading(false);
-
-            }
-
-        }
-
-        loadDoctors();
-
-    }, []);
-
-    if (loading)
-        return <h4>Loading doctors...</h4>;
-
-    return (
-        <div className="container-fluid">
-
-            <div className="d-flex justify-content-between align-items-center mb-4">
-
-                <h2>Doctors</h2>
-
-                <button className="btn btn-success">
-                    Add Doctor
-                </button>
-
-            </div>
-
-            <DoctorTable doctors={doctors} />
-
-        </div>
-    );
+        <tbody>
+          {doctors.map((doctor) => (
+            <tr key={doctor.id}>
+              <td>{doctor.name}</td>
+              <td>{doctor.department}</td>
+              <td>{doctor.specialization}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 export default Doctors;

@@ -1,9 +1,12 @@
-import api from "./api";
 
-export const getPatients = () => api.get("/patients");
+// services/dashboardService.js
 
-export const getDoctors = () => api.get("/doctors");
 
-export const getAppointments = () => api.get("/appointments");
+import axios from "axios";
 
-export const getMedicalRecords = () => api.get("/medical-records");
+const API_URL = "http://localhost:5001/api/dashboard";
+
+export async function getDashboard() {
+  const response = await axios.get(API_URL);
+  return response.data;
+}

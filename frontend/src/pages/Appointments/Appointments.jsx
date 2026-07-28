@@ -1,58 +1,54 @@
 
 import { useEffect, useState } from "react";
 import { getAppointments } from "../../services/appointmentService";
-import AppointmentTable from "../../components/tables/AppointmentTable";
 
 function Appointments() {
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    loadAppointments();
+  }, []);
 
-    const [appointments, setAppointments] = useState([]);
-    const [loading, setLoading] = useState(true);
+  async function loadAppointments() {
+    try {
+      const data = await getAppointments();
+      setAppointments(data);
+    } catch (err) {
+      console.error(err);
+      setError("Unable to load appointments.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
-    useEffect(() => {
+  return (
+    <div>
+      <h2>Appointments</h2>
 
-        async function loadAppointments() {
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Status</th>
+          </tr>
+        </thead>
 
-            try {
-
-                const data = await getAppointments();
-                setAppointments(data);
-
-            } catch (error) {
-
-                console.error(error);
-
-            } finally {
-
-                setLoading(false);
-
-            }
-
-        }
-
-        loadAppointments();
-
-    }, []);
-
-    if (loading)
-        return <h4>Loading appointments...</h4>;
-
-    return (
-        <div className="container-fluid">
-
-            <div className="d-flex justify-content-between align-items-center mb-4">
-
-                <h2>Appointments</h2>
-
-                <button className="btn btn-warning">
-                    Add Appointment
-                </button>
-
-            </div>
-
-            <AppointmentTable appointments={appointments} />
-
-        </div>
-    );
+        <tbody>
+          {appointments.map((appointment) => (
+            <tr key={appointment.id}>
+              <td>{appointment.id}</td>
+              <td>{appointment.patient_id}</td>
+              <td>{appointment.doctor_id}</td>
+              <td>{appointment.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 export default Appointments;

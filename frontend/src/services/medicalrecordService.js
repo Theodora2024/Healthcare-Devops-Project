@@ -1,6 +1,9 @@
-import api from "./api";
 
-export const getMedicalRecords = async () => {
-    const response = await api.get("/medical-records");
-    return response.data;
-};
+import axios from "axios";
+
+const API = "http://localhost:5001/api/medical-records";
+
+export async function getMedicalRecords() {
+  const response = await axios.get(API);
+  return response.data;
+}
