@@ -6,24 +6,14 @@ resource "aws_vpc" "this" {
 
   enable_dns_hostnames = true
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-${var.environment}-vpc"
-    }
-  )
+  tags = var.common_tags
 
 }
 resource "aws_internet_gateway" "this" {
 
   vpc_id = aws_vpc.this.id
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-igw"
-    }
-  )
+  tags = var.common_tags
 
 }
 resource "aws_subnet" "public_1" {
@@ -36,12 +26,7 @@ resource "aws_subnet" "public_1" {
 
   map_public_ip_on_launch = true
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-public-1"
-    }
-  )
+  tags = var.common_tags
 
 }
 resource "aws_subnet" "public_2" {
@@ -54,12 +39,7 @@ resource "aws_subnet" "public_2" {
 
   map_public_ip_on_launch = true
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-public-2"
-    }
-  )
+  tags = var.common_tags
 
 }
 resource "aws_subnet" "private_1" {
@@ -70,13 +50,7 @@ resource "aws_subnet" "private_1" {
 
   availability_zone = var.availability_zones[0]
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-private-1"
-    }
-  )
-
+  tags = var.common_tags
 }
 resource "aws_subnet" "private_2" {
 
@@ -86,24 +60,14 @@ resource "aws_subnet" "private_2" {
 
   availability_zone = var.availability_zones[1]
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-private-2"
-    }
-  )
+  tags = var.common_tags
 
 }
 resource "aws_eip" "nat" {
 
   domain = "vpc"
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-${var.environment}-nat-eip"
-    }
-  )
+  tags = var.common_tags
 
 }
 resource "aws_nat_gateway" "this" {
@@ -116,12 +80,7 @@ resource "aws_nat_gateway" "this" {
     aws_internet_gateway.this
   ]
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-${var.environment}-nat"
-    }
-  )
+  tags = var.common_tags
 
 }
 resource "aws_route_table" "public" {
@@ -136,13 +95,7 @@ resource "aws_route_table" "public" {
 
   }
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-${var.environment}-public-rt"
-    }
-  )
-
+  tags = var.common_tags
 }
 resource "aws_route_table" "private" {
 
@@ -156,12 +109,7 @@ resource "aws_route_table" "private" {
 
   }
 
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-${var.environment}-private-rt"
-    }
-  )
+  tags = var.common_tags
 
 }
 resource "aws_route_table_association" "public_1" {

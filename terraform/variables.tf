@@ -1,25 +1,33 @@
-variable "aws_region" {
-  description = "AWS Region"
-  type        = string
-}
+###################################
+# General
+###################################
 
 variable "project_name" {
-  description = "Project Name"
-  type        = string
+  type = string
 }
 
 variable "environment" {
-  description = "Deployment Environment"
-  type        = string
+  type = string
 }
 
 variable "owner" {
-  description = "Project Owner"
-  type        = string
+  type = string
 }
+
+variable "aws_region" {
+  type = string
+}
+
+###################################
+# Networking
+###################################
 
 variable "vpc_cidr" {
   type = string
+}
+
+variable "availability_zones" {
+  type = list(string)
 }
 
 variable "public_subnet_cidrs" {
@@ -30,13 +38,14 @@ variable "private_subnet_cidrs" {
   type = list(string)
 }
 
-variable "availability_zones" {
-  type = list(string)
-}
 variable "ssh_ingress_cidr" {
-  description = "Allowed SSH CIDR"
-  type        = string
+  type = string
 }
+
+###################################
+# EC2
+###################################
+
 variable "instance_type" {
   type = string
 }
@@ -44,12 +53,50 @@ variable "instance_type" {
 variable "key_name" {
   type = string
 }
+
 variable "root_volume_size" {
-  description = "Root EBS volume size in GB"
+  type = number
+}
+
+###################################
+# Database
+###################################
+
+variable "db_name" {
+  type = string
+}
+
+variable "db_username" {
+  type = string
+}
+
+variable "db_password" {
+  type      = string
+  sensitive = true
+}
+variable "instance_class" {
+  description = "RDS instance class"
+  type        = string
+}
+
+variable "allocated_storage" {
+  description = "RDS allocated storage in GB"
   type        = number
 }
+
+###################################
+# Application
+###################################
+
+variable "secret_key" {
+  type      = string
+  sensitive = true
+}
+
+###################################
+# Monitoring
+###################################
+
 variable "log_retention_days" {
-  description = "Number of days before log files expire"
-  type        = number
-  default     = 90
+  type = number
 }

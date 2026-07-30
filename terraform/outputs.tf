@@ -1,62 +1,60 @@
 
-# Root Outputs
 output "vpc_id" {
-  description = "VPC ID"
-  value       = module.vpc.vpc_id
-}
 
-output "public_subnet_ids" {
-  description = "Public subnet IDs"
-  value       = module.vpc.public_subnet_ids
-}
-
-output "private_subnet_ids" {
-  description = "Private subnet IDs"
-  value       = module.vpc.private_subnet_ids
-}
-
-output "internet_gateway_id" {
-  description = "Internet Gateway ID"
-  value       = module.vpc.internet_gateway_id
-}
-
-output "nat_gateway_id" {
-  description = "NAT Gateway ID"
-  value       = module.vpc.nat_gateway_id
-}
-
-output "security_group_id" {
-  value = module.security_group.security_group_id
-}
-output "instance_profile_name" {
-
-  value = module.iam.instance_profile_name
-
-}
-output "ec2_public_ip" {
-
-  value = module.ec2.public_ip
+  value = module.vpc.vpc_id
 
 }
 
-output "ec2_private_ip" {
+output "public_subnets" {
 
-  value = module.ec2.private_ip
+  value = module.vpc.public_subnet_ids
+
+}
+
+output "private_subnets" {
+
+  value = module.vpc.private_subnet_ids
 
 }
 
-output "instance_id" {
+output "backend_repository" {
 
-  value = module.ec2.instance_id
-
-}
-output "bucket_name" {
-
-  value = module.s3.bucket_name
+  value = module.ecr.backend_repository_url
 
 }
-output "cloudwatch_dashboard" {
 
-  value = module.cloudwatch.dashboard_name
+output "frontend_repository" {
+
+  value = module.ecr.frontend_repository_url
+
+}
+
+output "alb_dns_name" {
+
+  value = module.alb.alb_dns_name
+
+}
+
+output "database_endpoint" {
+
+  value = module.rds.db_endpoint
+
+}
+
+output "ecs_cluster" {
+
+  value = module.ecs.cluster_name
+
+}
+
+output "backend_service" {
+
+  value = module.ecs.backend_service_name
+
+}
+
+output "frontend_service" {
+
+  value = module.ecs.frontend_service_name
 
 }

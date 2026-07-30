@@ -8,17 +8,12 @@ variable "environment" {
   type        = string
 }
 
-variable "vpc_id" {
-  description = "VPC ID"
+variable "image_tag_mutability" {
+  description = "Image tag mutability"
   type        = string
+  default     = "MUTABLE"
 }
-
 variable "common_tags" {
   description = "Common resource tags"
   type        = map(string)
-}
-
-variable "ssh_ingress_cidr" {
-  description = "CIDR allowed to SSH"
-  type        = string
 }
