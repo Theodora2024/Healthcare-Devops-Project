@@ -12,20 +12,14 @@ def doctors():
     search = request.args.get("search", "")
 
     if search:
-        doctors = Doctor.query.filter(
-            Doctor.name.contains(search)
-        ).all()
+        doctors = Doctor.query.filter(Doctor.name.contains(search)).all()
     else:
         doctors = Doctor.query.order_by(Doctor.id.desc()).all()
 
-    return render_template(
-        "doctors.html",
-        doctors=doctors,
-        search=search
-    )
+    return render_template("doctors.html", doctors=doctors, search=search)
 
 
-@doctor_bp.route("/doctors/add", methods=["GET","POST"])
+@doctor_bp.route("/doctors/add", methods=["GET", "POST"])
 def add_doctor():
 
     form = DoctorForm()
@@ -37,24 +31,21 @@ def add_doctor():
             department=form.department.data,
             specialization=form.specialization.data,
             phone=form.phone.data,
-            email=form.email.data
+            email=form.email.data,
         )
 
         db.session.add(doctor)
 
         db.session.commit()
 
-        flash("Doctor added successfully.","success")
+        flash("Doctor added successfully.", "success")
 
         return redirect(url_for("doctor.doctors"))
 
-    return render_template(
-        "add_doctor.html",
-        form=form
-    )
+    return render_template("add_doctor.html", form=form)
 
 
-@doctor_bp.route("/doctors/edit/<int:id>",methods=["GET","POST"])
+@doctor_bp.route("/doctors/edit/<int:id>", methods=["GET", "POST"])
 def edit_doctor(id):
 
     doctor = Doctor.query.get_or_404(id)
@@ -67,15 +58,11 @@ def edit_doctor(id):
 
         db.session.commit()
 
-        flash("Doctor updated.","success")
+        flash("Doctor updated.", "success")
 
         return redirect(url_for("doctor.doctors"))
 
-    return render_template(
-        "add_doctor.html",
-        form=form,
-        edit=True
-    )
+    return render_template("add_doctor.html", form=form, edit=True)
 
 
 @doctor_bp.route("/doctors/delete/<int:id>")
@@ -87,6 +74,6 @@ def delete_doctor(id):
 
     db.session.commit()
 
-    flash("Doctor deleted.","warning")
+    flash("Doctor deleted.", "warning")
 
     return redirect(url_for("doctor.doctors"))

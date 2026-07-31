@@ -4,7 +4,6 @@ import random
 from app import app
 from models import db, Patient, Doctor, Appointment, MedicalRecord
 
-
 with app.app_context():
 
     print("Clearing existing data...")
@@ -15,7 +14,6 @@ with app.app_context():
     Patient.query.delete()
 
     db.session.commit()
-
 
     # -------------------------
     # Patients
@@ -32,13 +30,9 @@ with app.app_context():
             age=random.randint(18, 75),
             phone=f"08030000{i:03}",
             email=f"patient{i}@healthcare.com",
-            diagnosis=random.choice([
-                "Malaria",
-                "Hypertension",
-                "Diabetes",
-                "Asthma",
-                "Flu"
-            ])
+            diagnosis=random.choice(
+                ["Malaria", "Hypertension", "Diabetes", "Asthma", "Flu"]
+            ),
         )
 
         patients.append(patient)
@@ -47,7 +41,6 @@ with app.app_context():
     db.session.commit()
 
     print("✓ 10 Patients added")
-
 
     # -------------------------
     # Doctors
@@ -60,17 +53,17 @@ with app.app_context():
         "Pediatrics",
         "Orthopedics",
         "Neurology",
-        "General Medicine"
+        "General Medicine",
     ]
 
     for i in range(1, 6):
 
         doctor = Doctor(
             name=f"Dr. Johnson {i}",
-            department=departments[i-1],
-            specialization=departments[i-1],
+            department=departments[i - 1],
+            specialization=departments[i - 1],
             phone=f"09040000{i:03}",
-            email=f"doctor{i}@hospital.com"
+            email=f"doctor{i}@hospital.com",
         )
 
         doctors.append(doctor)
@@ -79,7 +72,6 @@ with app.app_context():
     db.session.commit()
 
     print("✓ 5 Doctors added")
-
 
     # -------------------------
     # Appointments
@@ -93,16 +85,10 @@ with app.app_context():
             patient_id=random.choice(patients).id,
             doctor_id=random.choice(doctors).id,
             appointment_date=date.today() + timedelta(days=i),
-            appointment_time=random.choice([
-                "09:00 AM",
-                "11:00 AM",
-                "01:00 PM",
-                "03:00 PM"
-            ]),
-            status=random.choice([
-                "Scheduled",
-                "Completed"
-            ])
+            appointment_time=random.choice(
+                ["09:00 AM", "11:00 AM", "01:00 PM", "03:00 PM"]
+            ),
+            status=random.choice(["Scheduled", "Completed"]),
         )
 
         appointments.append(appointment)
@@ -111,7 +97,6 @@ with app.app_context():
     db.session.commit()
 
     print("✓ 20 Appointments added")
-
 
     # -------------------------
     # Medical Records
@@ -124,14 +109,9 @@ with app.app_context():
         record = MedicalRecord(
             patient_id=random.choice(patients).id,
             doctor_id=random.choice(doctors).id,
-            diagnosis=random.choice([
-                "Hypertension",
-                "Diabetes",
-                "Asthma",
-                "Malaria"
-            ]),
+            diagnosis=random.choice(["Hypertension", "Diabetes", "Asthma", "Malaria"]),
             prescription="Medication prescribed",
-            notes="Patient responding well to treatment."
+            notes="Patient responding well to treatment.",
         )
 
         records.append(record)

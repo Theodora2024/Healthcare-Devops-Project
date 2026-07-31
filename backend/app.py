@@ -1,4 +1,3 @@
-
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -18,7 +17,6 @@ from routes.api.doctors import doctors_api
 from routes.api.appointments import appointments_api
 from routes.api.medical_records import medical_records_api
 from routes.api.dashboard import dashboard_api
-
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -44,4 +42,4 @@ app.register_blueprint(dashboard_api)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)    
+    app.run(debug=True)
