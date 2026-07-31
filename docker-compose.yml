@@ -5,15 +5,21 @@ services:
   postgres:
     image: postgres:16
     container_name: healthcare-postgres
+
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: healthcare
-      POSTGRES_PASSWORD: healthcare123
-      POSTGRES_DB: healthcare_db
+
+    env_file:
+      - backend/.env
+
     ports:
       - "5433:5432"
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - healthcare-network
+
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U healthcare -d healthcare_db"]
       interval: 10s
@@ -21,26 +27,48 @@ services:
       retries: 5
 
   backend:
-    build: ./backend
+
+    build:
+      context: ./backend
+
     container_name: healthcare-backend
+
+    restart: unless-stopped
+
     depends_on:
       postgres:
         condition: service_healthy
-    ports:
-      - "5001:5000"
+
     env_file:
       - backend/.env
-    
+
+    ports:
+      - "5001:5000"
+
+    networks:
+      - healthcare-network
 
   frontend:
-    build: ./frontend
+
+    build:
+      context: ./frontend
+
     container_name: healthcare-frontend
+
+    restart: unless-stopped
+
     depends_on:
-      backend:
-        condition: service_started
+      - backend
+
     ports:
-      - "5173:5173"
+      - "80:80"
+
+    networks:
+      - healthcare-network
 
 volumes:
   postgres_data:
+
+networks:
+  healthcare-network:
  
