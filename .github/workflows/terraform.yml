@@ -39,16 +39,29 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Show backend file
+        working-directory: terraform
+        run: |
+          pwd
+          ls -R
+          echo "===== backend-dev.hcl ====="
+          cat backend/backend-dev.hcl
       - name: Terraform Init
         working-directory: terraform
-        run: terraform init -backend-config=backend/backend-dev.hcl
-
+        run: |
+          terraform init \
+            -reconfigure \
+            -backend-config=backend/backend-dev.hcl
+      
       - name: Terraform Validate
+        working-directory: terraform
         run: terraform validate
 
       - name: Terraform Plan
+        working-directory: terraform
         run: terraform plan -var-file=environments/dev.tfvars
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
+        working-directory: terraform
         run: terraform apply -auto-approve -var-file=environments/dev.tfvars
