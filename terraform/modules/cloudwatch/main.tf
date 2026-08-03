@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
 
   metric_name = "CPUUtilization"
 
-  namespace = "AWS/EC2"
+  namespace           = "AWS/EC2"
 
   period = 300
 
@@ -44,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "status_check" {
 
   metric_name = "StatusCheckFailed"
 
-  namespace = "AWS/EC2"
+  namespace           = "AWS/EC2"
 
   period = 300
 

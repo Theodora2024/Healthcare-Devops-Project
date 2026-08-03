@@ -1,0 +1,79 @@
+
+name: Terraform Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+concurrency:
+  group: terraform-dev
+  cancel-in-progress: true
+jobs:
+
+  terraform:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Verify S3 Backend
+        run: |
+          aws sts get-caller-identity
+          aws s3 ls
+          aws s3 ls s3://terraform-state-healthcare-theodora
+      
+      - name: Show backend file
+        
+        run: |
+          pwd
+          ls -R
+          echo "===== backend-dev.hcl ====="
+          cat backend/backend-dev.hcl
+      
+      - name: Terraform Init
+                
+        run: terraform init -reconfigure -backend-config="backend/backend-dev.hcl"
+                            
+      - name: Terraform Validate
+       
+        run: terraform validate
+
+      - name: Show current workspace
+        run: |
+          terraform workspace show
+          terraform providers
+          terraform state list
+
+      - name: Terraform Plan
+        
+        run: terraform plan -lock-timeout=30s -input=false -no-color -var-file=environments/dev.tfvars
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        
+        run: terraform apply -auto-approve -var-file=environments/dev.tfvars
