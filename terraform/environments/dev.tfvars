@@ -1,15 +1,15 @@
 project_name = "healthcare"
-owner = "Theodora"
+owner        = "Theodora"
 
-aws_region = "eu-west-2"
+aws_region  = "eu-west-2"
 environment = "dev"
 
 instance_type = "t3.micro"
 
 root_volume_size = 30
 
-key_name = "sp-kpair"
-secret_key = "healthcare-dev-secret-key"
+key_name         = "sp-kpair"
+secret_key       = "healthcare-dev-secret-key"
 ssh_ingress_cidr = "0.0.0.0/0"
 
 vpc_cidr = "10.0.0.0/16"
@@ -32,6 +32,6 @@ db_name     = "healthcare_db"
 db_username = "healthcare"
 db_password = "healthcare123"
 
-instance_class    = "db.t3.micro"
-allocated_storage = 20
+instance_class     = "db.t3.micro"
+allocated_storage  = 20
 log_retention_days = 30

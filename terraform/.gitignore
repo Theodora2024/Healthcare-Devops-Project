@@ -10,7 +10,7 @@
 # Sensitive variable files (optional)
 *.tfvars
 !environments/*.tfvars
-
+.env
 # VS Code
 .vscode/
 

@@ -15,7 +15,7 @@ variable "owner" {
 }
 
 variable "aws_region" {
-  type = string
+  type    = string
   default = "eu-west-2"
 }
 
@@ -99,6 +99,6 @@ variable "secret_key" {
 ###################################
 
 variable "log_retention_days" {
-  type = number
+  type    = number
   default = 30
 }

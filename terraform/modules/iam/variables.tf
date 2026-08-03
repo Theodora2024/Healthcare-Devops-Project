@@ -12,3 +12,7 @@ variable "common_tags" {
   description = "Common tags"
   type        = map(string)
 }
+variable "secret_arn" {
+  description = "Secrets Manager secret ARN used by ECS"
+  type        = string
+}
