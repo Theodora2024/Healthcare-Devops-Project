@@ -63,9 +63,15 @@ jobs:
        
         run: terraform validate
 
+      - name: Show current workspace
+        run: |
+          terraform workspace show
+          terraform providers
+          terraform state list
+
       - name: Terraform Plan
         
-        run: terraform plan -var-file=environments/dev.tfvars
+        run: terraform plan -lock-timeout=30s -input=false -no-color -var-file=environments/dev.tfvars
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
