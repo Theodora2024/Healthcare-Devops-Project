@@ -38,6 +38,20 @@ module "security_group" {
 
 }
 
+module "secretsmanager" {
+  source = "./modules/secretsmanager"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  database_url = module.rds.database_url
+  db_username  = var.db_username
+  db_password  = var.db_password
+  secret_key   = var.secret_key
+
+  common_tags = local.common_tags
+}
+
 #########################################
 # IAM
 #########################################
@@ -50,7 +64,7 @@ module "iam" {
   environment  = var.environment
 
   common_tags = local.common_tags
-
+  secret_arn  = module.secretsmanager.secret_arn
 }
 
 #########################################
@@ -211,16 +225,4 @@ module "autoscaling" {
   common_tags = local.common_tags
 
 }
-module "secretsmanager" {
-  source = "./modules/secretsmanager"
 
-  project_name = var.project_name
-  environment  = var.environment
-
-  database_url = module.rds.database_url
-  db_username  = var.db_username
-  db_password  = var.db_password
-  secret_key   = var.secret_key
-
-  common_tags = local.common_tags
-}
