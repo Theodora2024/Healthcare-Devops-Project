@@ -10,7 +10,10 @@ resource "aws_ecr_repository" "frontend" {
 
   tags = var.common_tags
 }
-
+resource "aws_ecr_repository" "frontend" {
+  name         = "healthcare-dev-frontend"
+  force_delete = true  # <-- Add this line
+}
 
 resource "aws_ecr_repository" "backend" {
 
@@ -23,4 +26,8 @@ resource "aws_ecr_repository" "backend" {
   }
 
   tags = var.common_tags
+}
+resource "aws_ecr_repository" "backend" {
+  name         = "healthcare-dev-backend"
+  force_delete = true  # <-- Add this line
 }
