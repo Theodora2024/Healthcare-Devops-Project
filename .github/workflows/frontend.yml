@@ -39,5 +39,8 @@ jobs:
       - name: Build React App
         run: npm run build
 
-      - name: Docker Build
-        run: docker build -t healthcare-frontend .
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t healthcare-frontend:${{ github.sha }} \
+            -t healthcare-frontend:latest .

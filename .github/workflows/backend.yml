@@ -49,4 +49,6 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t healthcare-backend .
+          docker build \
+            -t healthcare-backend:${{ github.sha }} \
+            -t healthcare-backend:latest .
