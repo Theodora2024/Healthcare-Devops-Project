@@ -85,21 +85,23 @@ jobs:
       - name: Build Backend Image
         run: |
           docker build \
-             -t healthcare-${{ inputs.environment }}-backend \
+            -t healthcare-backend:${{ github.sha }} \
+            -t healthcare-backend:latest \         
             ./backend 
       - name: Build Frontend Image
         run: |
           docker build \
-            -t healthcare-${{ inputs.environment }}-frontend \
+            -t healthcare-frontend:${{ github.sha }} \
+            -t healthcare-frontend:latest \
             ./frontend 
       - name: Set Image Tag
         run: |
           IMAGE_TAG=${GITHUB_SHA::7}
           echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
           docker tag healthcare-${{ inputs.environment }}-backend:latest \
-            ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${IMAGE_TAG}
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-backend:${IMAGE_TAG}
           docker tag healthcare-${{ inputs.environment }}-backend:latest \
-            ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:latest
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-backend:latest
       - name: Tag Frontend Image
         run: |
           docker tag healthcare-${{ inputs.environment }}-frontend:latest \
