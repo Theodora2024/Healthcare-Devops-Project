@@ -109,6 +109,8 @@ resource "aws_iam_policy" "secrets_manager_access" {
 
   })
 
+
+  tags = var.common_tags
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_execution_secrets" {

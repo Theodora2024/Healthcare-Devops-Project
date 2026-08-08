@@ -10,9 +10,9 @@ resource "aws_ecs_task_definition" "frontend" {
 
   memory = var.memory
 
-  execution_role_arn = aws_iam_role.execution_role.arn
+  execution_role_arn = var.execution_role_arn
 
-  task_role_arn = aws_iam_role.task_role.arn
+  task_role_arn = var.task_role_arn
 
   container_definitions = jsonencode([
 
