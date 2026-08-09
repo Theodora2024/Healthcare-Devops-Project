@@ -19,7 +19,7 @@ variable "alb_security_group_id" {
 }
 
 variable "frontend_port" {
-  default = 5173
+  default = 80
 }
 
 variable "backend_port" {

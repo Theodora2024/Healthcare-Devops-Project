@@ -40,6 +40,9 @@ app.register_blueprint(appointments_api)
 app.register_blueprint(medical_records_api)
 app.register_blueprint(dashboard_api)
 
+@app.route("/health")
+def health():
+    return {"status": "healthy"}, 200
 
 if __name__ == "__main__":
     app.run(debug=True)

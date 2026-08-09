@@ -28,11 +28,15 @@ resource "aws_lb_target_group" "frontend" {
   vpc_id = var.vpc_id
 
   health_check {
-
-    path = "/"
-
-    matcher = "200"
-
+    enabled             = true
+    protocol            = "HTTP"
+    path                = "/"
+    port                = "traffic-port"
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    matcher             = "200"
   }
 
 }
@@ -49,11 +53,15 @@ resource "aws_lb_target_group" "backend" {
   vpc_id = var.vpc_id
 
   health_check {
-
-    path = "/api/patients"
-
-    matcher = "200"
-
+    enabled             = true
+    protocol            = "HTTP"
+    path                = "/health"
+    port                = "traffic-port"
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    matcher             = "200"
   }
 
 }

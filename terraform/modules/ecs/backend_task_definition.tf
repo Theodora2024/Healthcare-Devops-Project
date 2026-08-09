@@ -39,12 +39,14 @@ resource "aws_ecs_task_definition" "backend" {
 
 
       secrets = [
-
         {
           name      = "DATABASE_URL"
-          valueFrom = var.secret_arn
+          valueFrom = "${var.secret_arn}:DATABASE_URL::"
+        },
+        {
+          name      = "SECRET_KEY"
+          valueFrom = "${var.secret_arn}:SECRET_KEY::"
         }
-
       ]
       logConfiguration = {
 

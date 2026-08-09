@@ -35,7 +35,7 @@ variable "backend_repository_url" {
 }
 
 variable "frontend_container_port" {
-  default = 5173
+  default = 80
 }
 
 variable "backend_container_port" {

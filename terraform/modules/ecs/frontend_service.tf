@@ -30,7 +30,5 @@ resource "aws_ecs_service" "frontend" {
 
   }
 
-  depends_on = [
-    aws_iam_role_policy_attachment.execution_policy
-  ]
+
 }
