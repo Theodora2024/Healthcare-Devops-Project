@@ -17,7 +17,7 @@ resource "aws_lb" "this" {
 }
 resource "aws_lb_target_group" "frontend" {
 
-  name = "${var.project_name}-frontend"
+  name = "${var.project_name}-${var.environment}-frontend"
 
   port = var.frontend_port
 
@@ -26,6 +26,10 @@ resource "aws_lb_target_group" "frontend" {
   target_type = "ip"
 
   vpc_id = var.vpc_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   health_check {
     enabled             = true
@@ -39,10 +43,11 @@ resource "aws_lb_target_group" "frontend" {
     matcher             = "200"
   }
 
+
 }
 resource "aws_lb_target_group" "backend" {
 
-  name = "${var.project_name}-backend"
+  name = "${var.project_name}-${var.environment}-backend"
 
   port = var.backend_port
 
@@ -51,6 +56,10 @@ resource "aws_lb_target_group" "backend" {
   target_type = "ip"
 
   vpc_id = var.vpc_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   health_check {
     enabled             = true
