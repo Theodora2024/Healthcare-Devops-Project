@@ -102,11 +102,22 @@ resource "aws_security_group" "ecs" {
   description = "Security group for ECS tasks"
   vpc_id      = var.vpc_id
 
+  # Frontend
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+    description     = "Allow ALB to reach frontend on port 80"
+  }
+
+  # Backend
   ingress {
     from_port       = 5000
     to_port         = 5000
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
+    description     = "Allow ALB to reach backend on port 5000"
   }
 
   egress {
