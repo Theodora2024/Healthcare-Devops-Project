@@ -1,26 +1,29 @@
 name: Terraform Infrastructure
 
 on:
-
-  push:
-    branches:
-      - main
-    paths:
-      - "terraform/**"
-
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "terraform/**"
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: "Select environment to deploy"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+          - all
 
 concurrency:
-  group: terraform
-  cancel-in-progress: true
+  group: terraform-${{ github.event.inputs.target_env }}
+  cancel-in-progress: false
 
 jobs:
 
   deploy-dev:
+    if: |
+      github.event.inputs.target_env == 'dev' ||
+      github.event.inputs.target_env == 'all'
 
     uses: ./.github/workflows/terraform-deploy.yml
 
@@ -31,9 +34,20 @@ jobs:
 
     secrets: inherit
 
-  deploy-staging:
 
+  deploy-staging:
     needs: deploy-dev
+
+    if: |
+      always() &&
+      (
+        github.event.inputs.target_env == 'staging' ||
+        github.event.inputs.target_env == 'all'
+      ) &&
+      (
+        needs.deploy-dev.result == 'success' ||
+        needs.deploy-dev.result == 'skipped'
+      )
 
     uses: ./.github/workflows/terraform-deploy.yml
 
@@ -44,15 +58,26 @@ jobs:
 
     secrets: inherit
 
-  deploy-production:
 
+  deploy-prod:
     needs: deploy-staging
+
+    if: |
+      always() &&
+      (
+        github.event.inputs.target_env == 'prod' ||
+        github.event.inputs.target_env == 'all'
+      ) &&
+      (
+        needs.deploy-staging.result == 'success' ||
+        needs.deploy-staging.result == 'skipped'
+      )
 
     uses: ./.github/workflows/terraform-deploy.yml
 
     with:
-      environment: production
+      environment: prod
       backend_config: backend/backend-prod.hcl
       tfvars_file: environments/prod.tfvars
 
-    secrets: inherit                        
+    secrets: inherit                      

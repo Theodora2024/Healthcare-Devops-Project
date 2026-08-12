@@ -16,6 +16,7 @@ on:
         type: string
 
 jobs:
+
   deploy:
     runs-on: ubuntu-latest
 
@@ -24,13 +25,19 @@ jobs:
     env:
       AWS_ACCOUNT_ID: "245758552830"
 
-    defaults:
-      run:
-        working-directory: terraform
-
     steps:
+
+      # ==================================================
+      # CHECKOUT
+      # ==================================================
+
       - name: Checkout
         uses: actions/checkout@v4
+
+
+      # ==================================================
+      # TERRAFORM
+      # ==================================================
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -43,96 +50,178 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Terraform Init
-        run: terraform init -reconfigure -backend-config="${{ inputs.backend_config }}"
+        working-directory: terraform
+        run: |
+          terraform init \
+            -reconfigure \
+            -backend-config="${{ inputs.backend_config }}"
 
       - name: Terraform Validate
+        working-directory: terraform
         run: terraform validate
 
       - name: Terraform Plan
+        working-directory: terraform
         env:
           TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
           TF_VAR_secret_key: ${{ secrets.TF_VAR_secret_key }}
-        run: terraform plan -lock-timeout=30s -input=false -no-color -var-file="${{ inputs.tfvars_file }}"
+        run: |
+          terraform plan \
+            -lock-timeout=30s \
+            -input=false \
+            -no-color \
+            -var-file="${{ inputs.tfvars_file }}"
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
+        working-directory: terraform
         env:
           TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
           TF_VAR_secret_key: ${{ secrets.TF_VAR_secret_key }}
-        run: terraform apply -auto-approve -input=false -var-file="${{ inputs.tfvars_file }}"
+        run: |
+          terraform apply \
+            -auto-approve \
+            -input=false \
+            -var-file="${{ inputs.tfvars_file }}"
+
+
+      # ==================================================
+      # ECR LOGIN
+      # ==================================================
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Backend Image
-        working-directory: .
-        run: docker build -t healthcare-backend:${{ github.sha }} -t healthcare-backend:latest ./backend
 
-      - name: Build Frontend Image
-        working-directory: .
-        run: docker build -t healthcare-frontend:${{ github.sha }} -t healthcare-frontend:latest ./frontend
+      # ==================================================
+      # IMAGE TAG
+      # ==================================================
 
       - name: Set Image Tag
-        working-directory: .
-        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+        run: |
+          echo "IMAGE_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+
+      # ==================================================
+      # BUILD BACKEND
+      # ==================================================
+
+      - name: Build Backend Image
+        run: |
+          docker build \
+            -t healthcare-backend:${GITHUB_SHA} \
+            -t healthcare-backend:latest \
+            ./backend
+
+
+      # ==================================================
+      # BUILD FRONTEND
+      # ==================================================
+
+      - name: Build Frontend Image
+        run: |
+          docker build \
+            -t healthcare-frontend:${GITHUB_SHA} \
+            -t healthcare-frontend:latest \
+            ./frontend
+
+
+      # ==================================================
+      # TAG BACKEND
+      # ==================================================
 
       - name: Tag Backend Image
-        working-directory: .
         run: |
-          docker tag healthcare-backend:${{ github.sha }} \
+          docker tag healthcare-backend:${GITHUB_SHA} \
             ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${IMAGE_TAG}
 
-          docker tag healthcare-backend:${{ github.sha }} \
+          docker tag healthcare-backend:${GITHUB_SHA} \
             ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:latest
 
+
+      # ==================================================
+      # TAG FRONTEND
+      # ==================================================
+
       - name: Tag Frontend Image
-        working-directory: .
         run: |
-          docker tag healthcare-frontend:${{ github.sha }} \
+          docker tag healthcare-frontend:${GITHUB_SHA} \
             ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${IMAGE_TAG}
 
-          docker tag healthcare-frontend:${{ github.sha }} \
+          docker tag healthcare-frontend:${GITHUB_SHA} \
             ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:latest
 
+
+      # ==================================================
+      # PUSH BACKEND
+      # ==================================================
+
       - name: Push Backend Image
-        working-directory: .
         run: |
-          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${IMAGE_TAG}
-          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:latest
+          docker push \
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${IMAGE_TAG}
+
+          docker push \
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:latest
+
+
+      # ==================================================
+      # PUSH FRONTEND
+      # ==================================================
 
       - name: Push Frontend Image
-        working-directory: .
         run: |
-          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${IMAGE_TAG}
-          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:latest
+          docker push \
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${IMAGE_TAG}
+
+          docker push \
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:latest
+
+
+      # ==================================================
+      # ECS BACKEND
+      # ==================================================
 
       - name: Deploy Backend
-        working-directory: .
         run: |
           aws ecs update-service \
             --cluster healthcare-${{ inputs.environment }} \
             --service healthcare-backend \
-            --force-new-deployment
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION }}
+
+
+      # ==================================================
+      # ECS FRONTEND
+      # ==================================================
 
       - name: Deploy Frontend
-        working-directory: .
         run: |
           aws ecs update-service \
             --cluster healthcare-${{ inputs.environment }} \
             --service healthcare-frontend \
-            --force-new-deployment
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION }}
+
+
+      # ==================================================
+      # WAIT BACKEND
+      # ==================================================
 
       - name: Wait for Backend
-        working-directory: .
         run: |
           aws ecs wait services-stable \
             --cluster healthcare-${{ inputs.environment }} \
-            --services healthcare-backend
+            --services healthcare-backend \
+            --region ${{ secrets.AWS_REGION }}
+
+
+      # ==================================================
+      # WAIT FRONTEND
+      # ==================================================
 
       - name: Wait for Frontend
-        working-directory: .
         run: |
           aws ecs wait services-stable \
             --cluster healthcare-${{ inputs.environment }} \
-            --services healthcare-frontend
+            --services healthcare-frontend \
+            --region ${{ secrets.AWS_REGION }}
