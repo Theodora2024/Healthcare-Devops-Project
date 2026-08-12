@@ -36,10 +36,9 @@ output "alb_dns_name" {
 }
 
 output "database_endpoint" {
-
-  value = module.rds.db_endpoint
-
+  value = var.enable_rds ? module.rds[0].db_endpoint : null
 }
+
 
 output "ecs_cluster" {
 
