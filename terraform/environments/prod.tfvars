@@ -2,9 +2,9 @@ project_name = "healthcare"
 owner        = "Theodora"
 aws_region   = "eu-west-2"
 
-environment   = "prod"
-enable_rds    = false
-instance_type = "t3.small"
+environment = "prod"
+
+instance_type = "t3.micro"
 
 root_volume_size = 30
 
@@ -31,7 +31,7 @@ private_subnet_cidrs = [
 db_name     = "healthcare_db"
 db_username = "healthcare"
 
-instance_class = "db.t3.small"
+instance_class = "db.t3.micro"
 
 allocated_storage = 20
 

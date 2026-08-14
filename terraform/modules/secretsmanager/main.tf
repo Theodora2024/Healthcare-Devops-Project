@@ -1,7 +1,7 @@
 resource "aws_secretsmanager_secret" "healthcare" {
 
-  name = "${var.project_name}-${var.environment}-secret"
-
+  name                    = "${var.project_name}-${var.environment}-secret"
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "healthcare" {

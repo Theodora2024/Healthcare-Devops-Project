@@ -36,7 +36,7 @@ output "alb_dns_name" {
 }
 
 output "database_endpoint" {
-  value = var.enable_rds ? module.rds[0].db_endpoint : null
+  value = module.rds.db_endpoint
 }
 
 

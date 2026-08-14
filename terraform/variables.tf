@@ -84,11 +84,7 @@ variable "allocated_storage" {
   description = "RDS allocated storage in GB"
   type        = number
 }
-variable "enable_rds" {
-  description = "Whether to create an RDS database for this environment"
-  type        = bool
-  default     = true
-}
+
 
 ###################################
 # Application

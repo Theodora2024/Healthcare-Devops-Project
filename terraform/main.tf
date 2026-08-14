@@ -44,7 +44,7 @@ module "secretsmanager" {
   project_name = var.project_name
   environment  = var.environment
 
-  database_url = var.enable_rds ? module.rds[0].database_url : ""
+  database_url = module.rds.database_url
   db_username  = var.db_username
   db_password  = var.db_password
   secret_key   = var.secret_key
@@ -126,7 +126,6 @@ module "alb" {
 
 module "rds" {
 
-  count = var.enable_rds ? 1 : 0
 
   source = "./modules/rds"
 
@@ -173,7 +172,7 @@ module "ecs" {
   execution_role_arn = module.iam.execution_role_arn
   task_role_arn      = module.iam.task_role_arn
 
-  database_url = var.enable_rds ? module.rds[0].database_url : ""
+  database_url = module.rds.database_url
 
   secret_key = var.secret_key
   secret_arn = module.secretsmanager.secret_arn
