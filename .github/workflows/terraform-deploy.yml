@@ -178,30 +178,114 @@ jobs:
 
 
       # ==================================================
-      # ECS BACKEND
+      # ECS BACKEND - REGISTER NEW TASK DEFINITION
       # ==================================================
 
       - name: Deploy Backend
         run: |
-          aws ecs update-service \
-            --cluster healthcare-${{ inputs.environment }} \
-            --service healthcare-backend \
-            --force-new-deployment \
-            --region ${{ secrets.AWS_REGION }}
+          CLUSTER="healthcare-${{ inputs.environment }}"
+          SERVICE="healthcare-backend"
+          REGION="${{ secrets.AWS_REGION }}"
+          IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${IMAGE_TAG}"
 
+          echo "Deploying backend image: $IMAGE"
+
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition healthcare-backend \
+            --region "$REGION" \
+            --query 'taskDefinition' \
+            --output json)
+
+          NEW_TASK_DEF=$(echo "$TASK_DEF" | jq \
+            --arg IMAGE "$IMAGE" \
+            '{
+              family: .family,
+              taskRoleArn: .taskRoleArn,
+              executionRoleArn: .executionRoleArn,
+              networkMode: .networkMode,
+              containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
+              volumes: .volumes,
+              placementConstraints: .placementConstraints,
+              requiresCompatibilities: .requiresCompatibilities,
+              cpu: .cpu,
+              memory: .memory
+            }')
+
+          REVISION=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF" \
+            --region "$REGION" \
+            --query 'taskDefinition.revision' \
+            --output text)
+
+          echo "Registered backend task definition revision: $REVISION"
+
+          aws ecs update-service \
+            --cluster "$CLUSTER" \
+            --service "$SERVICE" \
+            --task-definition "healthcare-backend:$REVISION" \
+            --region "$REGION"
+
+          aws ecs wait services-stable \
+            --cluster "$CLUSTER" \
+            --services "$SERVICE" \
+            --region "$REGION"
+
+          echo "Backend deployment successful."
 
       # ==================================================
-      # ECS FRONTEND
+      # ECS FRONTEND - REGISTER NEW TASK DEFINITION
       # ==================================================
 
       - name: Deploy Frontend
         run: |
-          aws ecs update-service \
-            --cluster healthcare-${{ inputs.environment }} \
-            --service healthcare-frontend \
-            --force-new-deployment \
-            --region ${{ secrets.AWS_REGION }}
+          CLUSTER="healthcare-${{ inputs.environment }}"
+          SERVICE="healthcare-frontend"
+          REGION="${{ secrets.AWS_REGION }}"
+          IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${IMAGE_TAG}"
 
+          echo "Deploying frontend image: $IMAGE"
+
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition healthcare-frontend \
+            --region "$REGION" \
+            --query 'taskDefinition' \
+            --output json)
+
+          NEW_TASK_DEF=$(echo "$TASK_DEF" | jq \
+            --arg IMAGE "$IMAGE" \
+            '{
+              family: .family,
+              taskRoleArn: .taskRoleArn,
+              executionRoleArn: .executionRoleArn,
+              networkMode: .networkMode,
+              containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
+              volumes: .volumes,
+              placementConstraints: .placementConstraints,
+              requiresCompatibilities: .requiresCompatibilities,
+              cpu: .cpu,
+              memory: .memory
+            }')
+
+          REVISION=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF" \
+            --region "$REGION" \
+            --query 'taskDefinition.revision' \
+            --output text)
+
+          echo "Registered frontend task definition revision: $REVISION"
+
+          aws ecs update-service \
+            --cluster "$CLUSTER" \
+            --service "$SERVICE" \
+            --task-definition "healthcare-frontend:$REVISION" \
+            --region "$REGION"
+
+          aws ecs wait services-stable \
+            --cluster "$CLUSTER" \
+            --services "$SERVICE" \
+            --region "$REGION"
+
+          echo "Frontend deployment successful."
 
       # ==================================================
       # WAIT BACKEND
@@ -213,7 +297,6 @@ jobs:
             --cluster healthcare-${{ inputs.environment }} \
             --services healthcare-backend \
             --region ${{ secrets.AWS_REGION }}
-
 
       # ==================================================
       # WAIT FRONTEND

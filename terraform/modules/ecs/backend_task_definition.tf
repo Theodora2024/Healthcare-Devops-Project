@@ -67,5 +67,7 @@ resource "aws_ecs_task_definition" "backend" {
     }
 
   ])
-
+  lifecycle {
+    create_before_destroy = true
+  }
 }

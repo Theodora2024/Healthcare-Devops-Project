@@ -55,5 +55,7 @@ resource "aws_ecs_task_definition" "frontend" {
     }
 
   ])
-
+  lifecycle {
+    create_before_destroy = true
+  }
 }
