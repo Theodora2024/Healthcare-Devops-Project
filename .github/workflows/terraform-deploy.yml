@@ -42,13 +42,13 @@ jobs:
       # CHECKOUT EKS INFRASTRUCTURE REPOSITORY
       # ==================================================
 
-      - name: Checkout EKS infrastructure
+      - name: Checkout GTC infrastructure repository
         uses: actions/checkout@v4
         with:
           repository: Theodora2024/gtc-infrastructure
           ref: theodora-eks-tf-deploy
           path: gtc-infrastructure
-          token: ${{ secrets.GTC_INFRA_TOKEN || github.token }}
+          token: ${{ secrets.GTC_INFRA_TOKEN }}
 
 
       # ==================================================

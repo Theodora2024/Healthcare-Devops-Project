@@ -16,12 +16,12 @@
   cancel-in-progress: false
 
  jobs:
-
   deploy-prod:
+    permissions:
+      id-token: write
+      contents: read
 
     uses: ./.github/workflows/terraform-deploy.yml
-
     with:
       environment: prod
-
     secrets: inherit
