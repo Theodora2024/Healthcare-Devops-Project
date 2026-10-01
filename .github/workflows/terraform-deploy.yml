@@ -7,47 +7,62 @@ on:
         required: true
         type: string
 
-      backend_config:
-        required: true
-        type: string
-
-      tfvars_file:
-        required: true
-        type: string
-
 jobs:
 
   deploy:
+
     runs-on: ubuntu-latest
+
     permissions:
-        id-token: write
-        contents: read
+      id-token: write
+      contents: read
+
     environment: ${{ inputs.environment }}
 
     env:
       AWS_ACCOUNT_ID: "245758552830"
-      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_REGION: "eu-west-2"
       CLUSTER_NAME: "eks-infra-prod"
       NAMESPACE: "healthcare"
+      GTC_INFRA_PATH: "gtc-infrastructure"
+
     steps:
 
       # ==================================================
-      # CHECKOUT
+      # CHECKOUT APPLICATION REPOSITORY
       # ==================================================
 
-      - name: Checkout
+      - name: Checkout application
         uses: actions/checkout@v4
+        with:
+          path: healthcare-app
+
 
       # ==================================================
-      # AWS AUTHENTICATION
+      # CHECKOUT EKS INFRASTRUCTURE REPOSITORY
       # ==================================================
-    
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4     
+
+      - name: Checkout EKS infrastructure
+        uses: actions/checkout@v4
         with:
-           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
-           aws-region: ${{ vars.AWS_REGION }}
-           role-session-name: HealthcareEKSDeployment
+          repository: Theodora2024/gtc-infrastructure
+          ref: theodora-eks-tf-deploy
+          path: gtc-infrastructure
+          token: ${{ secrets.GTC_INFRA_TOKEN || github.token }}
+
+
+      # ==================================================
+      # AWS OIDC AUTHENTICATION
+      # ==================================================
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::245758552830:role/HealthcareGitHubActionsEKSDeployRole
+          aws-region: eu-west-2
+          role-session-name: HealthcareEKSDeployment
+
+
       # ==================================================
       # IMAGE TAG
       # ==================================================
@@ -65,8 +80,6 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
 
-      
-
       # ==================================================
       # BUILD BACKEND
       # ==================================================
@@ -74,8 +87,8 @@ jobs:
       - name: Build Backend Image
         run: |
           docker build \
-            -t healthcare-backend:${GITHUB_SHA} \           
-            ./backend
+            -t healthcare-backend:${GITHUB_SHA} \
+            ./healthcare-app/backend
 
 
       # ==================================================
@@ -86,7 +99,7 @@ jobs:
         run: |
           docker build \
             -t healthcare-frontend:${GITHUB_SHA} \
-            ./frontend
+            ./healthcare-app/frontend
 
 
       # ==================================================
@@ -96,8 +109,8 @@ jobs:
       - name: Tag Backend Image
         run: |
           docker tag \
-          healthcare-backend:${GITHUB_SHA} \
-          ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${IMAGE_TAG}
+            healthcare-backend:${GITHUB_SHA} \
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/healthcare-prod-backend:${IMAGE_TAG}
 
 
       # ==================================================
@@ -107,10 +120,10 @@ jobs:
       - name: Tag Frontend Image
         run: |
           docker tag \
-          healthcare-frontend:${GITHUB_SHA} \
-          ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${IMAGE_TAG}
+            healthcare-frontend:${GITHUB_SHA} \
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/healthcare-prod-frontend:${IMAGE_TAG}
 
-          
+
       # ==================================================
       # PUSH BACKEND
       # ==================================================
@@ -118,9 +131,8 @@ jobs:
       - name: Push Backend Image
         run: |
           docker push \
-            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${IMAGE_TAG}
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/healthcare-prod-backend:${IMAGE_TAG}
 
-          
 
       # ==================================================
       # PUSH FRONTEND
@@ -129,35 +141,7 @@ jobs:
       - name: Push Frontend Image
         run: |
           docker push \
-            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${IMAGE_TAG}
-
-          
-      # ==================================================
-      # TERRAFORM
-      # ==================================================
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init
-        working-directory: terraform
-        run: |
-          terraform init \
-            -reconfigure \
-            -backend-config="${{ inputs.backend_config }}"
-
-      - name: Terraform Validate
-        working-directory: terraform
-        run: terraform validate
-      # ==================================================
-      # EKS ACCESS
-      # ==================================================
-
-      - name: Configure kubectl
-        run: |
-          aws eks update-kubeconfig \
-            --region "$AWS_REGION" \
-            --name "$CLUSTER_NAME"
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/healthcare-prod-frontend:${IMAGE_TAG}
 
 
       # ==================================================
@@ -169,41 +153,149 @@ jobs:
           aws eks describe-cluster \
             --name "$CLUSTER_NAME" \
             --region "$AWS_REGION" \
-            --query 'cluster.status' \
-            --output text
+            --query 'cluster.{Name:name,Status:status,Version:version}' \
+            --output table
 
-          kubectl get nodes
-      
-      - name: Terraform Plan
-        working-directory: terraform
+
+      # ==================================================
+      # GIVE GITHUB ACTIONS ROLE EKS ACCESS
+      # ==================================================
+
+      - name: Ensure GitHub Actions EKS access
         env:
-          TF_VAR_backend_image: "245758552830.dkr.ecr.eu-west-2.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${{ env.IMAGE_TAG }}"
-          TF_VAR_frontend_image: "245758552830.dkr.ecr.eu-west-2.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${{ env.IMAGE_TAG }}"
-          TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
-          TF_VAR_secret_key: ${{ secrets.TF_VAR_secret_key }}
+          PRINCIPAL_ARN: arn:aws:iam::245758552830:role/HealthcareGitHubActionsEKSDeployRole
+          POLICY_ARN: arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+        run: |
+
+          if aws eks describe-access-entry \
+            --cluster-name "$CLUSTER_NAME" \
+            --principal-arn "$PRINCIPAL_ARN" \
+            --region "$AWS_REGION" >/dev/null 2>&1
+          then
+            echo "EKS access entry already exists."
+          else
+            echo "Creating EKS access entry..."
+
+            aws eks create-access-entry \
+              --cluster-name "$CLUSTER_NAME" \
+              --principal-arn "$PRINCIPAL_ARN" \
+              --type STANDARD \
+              --region "$AWS_REGION"
+
+            echo "Waiting for access entry..."
+            sleep 10
+          fi
+
+          POLICY_EXISTS=$(aws eks list-associated-access-policies \
+            --cluster-name "$CLUSTER_NAME" \
+            --principal-arn "$PRINCIPAL_ARN" \
+            --region "$AWS_REGION" \
+            --query "associatedAccessPolicies[?policyArn=='${POLICY_ARN}'].policyArn" \
+            --output text)
+
+          if [ -z "$POLICY_EXISTS" ]; then
+
+            echo "Associating cluster-admin policy..."
+
+            aws eks associate-access-policy \
+              --cluster-name "$CLUSTER_NAME" \
+              --principal-arn "$PRINCIPAL_ARN" \
+              --policy-arn "$POLICY_ARN" \
+              --access-scope type=cluster \
+              --region "$AWS_REGION"
+
+          else
+
+            echo "Cluster-admin policy already associated."
+
+          fi
+
+
+      # ==================================================
+      # CONFIGURE KUBECTL
+      # ==================================================
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --region "$AWS_REGION" \
+            --name "$CLUSTER_NAME"
+
+
+      # ==================================================
+      # VERIFY KUBERNETES ACCESS
+      # ==================================================
+
+      - name: Verify Kubernetes Access
+        run: |
+          kubectl get nodes
+          kubectl get namespaces
+
+
+      # ==================================================
+      # SETUP TERRAFORM
+      # ==================================================
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+
+      # ==================================================
+      # TERRAFORM INIT
+      # ==================================================
+
+      - name: Terraform Init
+        working-directory: gtc-infrastructure/workspaces/eks
+        run: |
+          terraform init -reconfigure
+
+
+      # ==================================================
+      # TERRAFORM VALIDATE
+      # ==================================================
+
+      - name: Terraform Validate
+        working-directory: gtc-infrastructure/workspaces/eks
+        run: |
+          terraform validate
+
+
+      # ==================================================
+      # TERRAFORM PLAN
+      # ==================================================
+
+      - name: Terraform Plan
+        working-directory: gtc-infrastructure/workspaces/eks
+        env:
+          TF_VAR_backend_image: "245758552830.dkr.ecr.eu-west-2.amazonaws.com/healthcare-prod-backend:${{ env.IMAGE_TAG }}"
+          TF_VAR_frontend_image: "245758552830.dkr.ecr.eu-west-2.amazonaws.com/healthcare-prod-frontend:${{ env.IMAGE_TAG }}"
         run: |
           terraform plan \
             -lock-timeout=5m \
             -input=false \
             -no-color \
-            -var-file="${{ inputs.tfvars_file }}" \
+            -var-file="values.tfvars" \
             -out=tfplan
-           
+
+
+      # ==================================================
+      # TERRAFORM APPLY
+      # ==================================================
+
       - name: Terraform Apply
-        working-directory: terraform
+        working-directory: gtc-infrastructure/workspaces/eks
         env:
-          TF_VAR_backend_image: "245758552830.dkr.ecr.eu-west-2.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${{ env.IMAGE_TAG }}"
-          TF_VAR_frontend_image: "245758552830.dkr.ecr.eu-west-2.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${{ env.IMAGE_TAG }}"
-          TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
-          TF_VAR_secret_key: ${{ secrets.TF_VAR_secret_key }}
+          TF_VAR_backend_image: "245758552830.dkr.ecr.eu-west-2.amazonaws.com/healthcare-prod-backend:${{ env.IMAGE_TAG }}"
+          TF_VAR_frontend_image: "245758552830.dkr.ecr.eu-west-2.amazonaws.com/healthcare-prod-frontend:${{ env.IMAGE_TAG }}"
         run: |
           terraform apply \
             -auto-approve \
             -input=false \
-            -var-file="${{ inputs.tfvars_file }}" \
-            -out=tfplan
-        # ==================================================
-      # ROLLOUT BACKEND
+            tfplan
+
+
+      # ==================================================
+      # VERIFY BACKEND ROLLOUT
       # ==================================================
 
       - name: Verify Backend Rollout
@@ -215,7 +307,7 @@ jobs:
 
 
       # ==================================================
-      # ROLLOUT FRONTEND
+      # VERIFY FRONTEND ROLLOUT
       # ==================================================
 
       - name: Verify Frontend Rollout
@@ -227,152 +319,21 @@ jobs:
 
 
       # ==================================================
-      # VERIFY APPLICATION
+      # VERIFY HEALTHCARE APPLICATION
       # ==================================================
 
       - name: Verify Healthcare Workloads
         run: |
-          echo "=== Pods ==="
+          echo "=== PODS ==="
           kubectl get pods -n "$NAMESPACE" -o wide
 
-          echo "=== Services ==="
+          echo "=== SERVICES ==="
           kubectl get services -n "$NAMESPACE"
 
-          echo "=== Ingress ==="
+          echo "=== INGRESS ==="
           kubectl get ingress -n "$NAMESPACE"
 
-          echo "=== Deployments ==="
+          echo "=== DEPLOYMENTS ==="
           kubectl get deployments -n "$NAMESPACE"
 
-          echo "Healthcare EKS deployment completed successfully."      
-      # ==================================================
-      # ECS BACKEND - REGISTER NEW TASK DEFINITION
-      # ==================================================
-
-      #- name: Deploy Backend
-       # run: |
-          #CLUSTER="healthcare-${{ inputs.environment }}"
-          #SERVICE="healthcare-backend"
-          #REGION="${{ secrets.AWS_REGION }}"
-          #IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/healthcare-${{ inputs.environment }}-backend:${IMAGE_TAG}"
-
-          #echo "Deploying backend image: $IMAGE"
-
-          #TASK_DEF=$(aws ecs describe-task-definition \
-            #--task-definition healthcare-backend \
-            #--region "$REGION" \
-            #--query 'taskDefinition' \
-            #--output json)
-
-          #NEW_TASK_DEF=$(echo "$TASK_DEF" | jq \
-            #--arg IMAGE "$IMAGE" \
-           # '{
-              #family: .family,
-              #taskRoleArn: .taskRoleArn,
-              #executionRoleArn: .executionRoleArn,
-              #networkMode: .networkMode,
-              #containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
-              #volumes: .volumes,
-              #placementConstraints: .placementConstraints,
-              #requiresCompatibilities: .requiresCompatibilities,
-              #cpu: .cpu,
-              #memory: .memory
-            #}')
-
-          #REVISION=$(aws ecs register-task-definition \
-            #--cli-input-json "$NEW_TASK_DEF" \
-            #--region "$REGION" \
-            #--query 'taskDefinition.revision' \
-            #--output text)
-
-          #echo "Registered backend task definition revision: $REVISION"
-
-          #aws ecs update-service \
-            #--cluster "$CLUSTER" \
-            #--service "$SERVICE" \
-            #--task-definition "healthcare-backend:$REVISION" \
-            #--region "$REGION"
-
-          #aws ecs wait services-stable \
-           # --cluster "$CLUSTER" \
-           # --services "$SERVICE" \
-            #--region "$REGION"
-
-          #echo "Backend deployment successful."
-    
-      # ==================================================
-      # ECS FRONTEND - REGISTER NEW TASK DEFINITION
-      # ==================================================
-
-      #- name: Deploy Frontend
-        #run: |
-          #CLUSTER="healthcare-${{ inputs.environment }}"
-          #SERVICE="healthcare-frontend"
-          #REGION="${{ secrets.AWS_REGION }}"
-          #IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/healthcare-${{ inputs.environment }}-frontend:${IMAGE_TAG}"
-
-          #echo "Deploying frontend image: $IMAGE"
-
-          #TASK_DEF=$(aws ecs describe-task-definition \
-            #--task-definition healthcare-frontend \
-            #--region "$REGION" \
-            #--query 'taskDefinition' \
-            #--output json)
-
-          #NEW_TASK_DEF=$(echo "$TASK_DEF" | jq \
-            #--arg IMAGE "$IMAGE" \
-            #'{
-              #family: .family,
-              #taskRoleArn: .taskRoleArn,
-              #executionRoleArn: .executionRoleArn,
-              #networkMode: .networkMode,
-              #containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
-              #volumes: .volumes,
-              #placementConstraints: .placementConstraints,
-              #requiresCompatibilities: .requiresCompatibilities,
-              #cpu: .cpu,
-              #memory: .memory
-            #}')
-
-          #REVISION=$(aws ecs register-task-definition \
-            #--cli-input-json "$NEW_TASK_DEF" \
-            #--region "$REGION" \
-            #--query 'taskDefinition.revision' \
-            #--output text)
-
-          #echo "Registered frontend task definition revision: $REVISION"
-
-          #aws ecs update-service \
-            #--cluster "$CLUSTER" \
-            #--service "$SERVICE" \
-            #--task-definition "healthcare-frontend:$REVISION" \
-            #--region "$REGION"
-
-          #aws ecs wait services-stable \
-            #--cluster "$CLUSTER" \
-            #--services "$SERVICE" \
-            #--region "$REGION"
-
-          #echo "Frontend deployment successful."
-
-      # ==================================================
-      # WAIT BACKEND
-      # ==================================================
-
-      #- name: Wait for Backend
-        #run: |
-          #aws ecs wait services-stable \
-            #--cluster healthcare-${{ inputs.environment }} \
-            #--services healthcare-backend \
-            #--region ${{ secrets.AWS_REGION }}
-
-      # ==================================================
-      # WAIT FRONTEND
-      # ==================================================
-
-      #- name: Wait for Frontend
-        #run: |
-          #aws ecs wait services-stable \
-            #--cluster healthcare-${{ inputs.environment }} \
-            #--services healthcare-frontend \
-            #--region ${{ secrets.AWS_REGION }}
+          echo "Healthcare EKS deployment completed successfully."

@@ -1,83 +1,27 @@
-name: Terraform Infrastructure
+ name: Terraform Infrastructure
 
-on:
+ on:
   workflow_dispatch:
     inputs:
       target_env:
         description: "Select environment to deploy"
         required: true
-        default: "dev"
+        default: "prod"
         type: choice
         options:
-          - dev
-          - staging
           - prod
-          - all
 
-concurrency:
+ concurrency:
   group: terraform-${{ github.event.inputs.target_env }}
   cancel-in-progress: false
 
-jobs:
-
-  deploy-dev:
-    if: |
-      github.event.inputs.target_env == 'dev' ||
-      github.event.inputs.target_env == 'all'
-
-    uses: ./.github/workflows/terraform-deploy.yml
-
-    with:
-      environment: dev
-      backend_config: backend/backend-dev.hcl
-      tfvars_file: environments/dev.tfvars
-
-    secrets: inherit
-
-
-  deploy-staging:
-    needs: deploy-dev
-
-    if: |
-      always() &&
-      (
-        github.event.inputs.target_env == 'staging' ||
-        github.event.inputs.target_env == 'all'
-      ) &&
-      (
-        needs.deploy-dev.result == 'success' ||
-        needs.deploy-dev.result == 'skipped'
-      )
-
-    uses: ./.github/workflows/terraform-deploy.yml
-
-    with:
-      environment: staging
-      backend_config: backend/backend-staging.hcl
-      tfvars_file: environments/staging.tfvars
-
-    secrets: inherit
-
+ jobs:
 
   deploy-prod:
-    needs: deploy-staging
-
-    if: |
-      always() &&
-      (
-        github.event.inputs.target_env == 'prod' ||
-        github.event.inputs.target_env == 'all'
-      ) &&
-      (
-        needs.deploy-staging.result == 'success' ||
-        needs.deploy-staging.result == 'skipped'
-      )
 
     uses: ./.github/workflows/terraform-deploy.yml
 
     with:
       environment: prod
-      backend_config: backend/backend-prod.hcl
-      tfvars_file: environments/prod.tfvars
 
-    secrets: inherit                      
+    secrets: inherit
